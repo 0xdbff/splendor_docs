@@ -4,8 +4,10 @@ export function baseOptions(): BaseLayoutProps {
   return {
     githubUrl: 'https://github.com/splendor-os/kernel',
     themeSwitch: {
-      enabled: true,
-      mode: 'light-dark',
+      enabled: false,
+    },
+    searchToggle: {
+      enabled: false,
     },
     links: [
       {
