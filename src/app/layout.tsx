@@ -39,11 +39,20 @@ export const metadata: Metadata = {
     url: 'https://docs.splendor-k.org',
     siteName: 'Splendor Kernel',
     type: 'website',
+    images: [
+      {
+        url: '/og/splendor-og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Splendor Kernel',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Splendor Kernel',
     description: 'Design-stage kernel docs. Initial code push pending.',
+    images: ['/og/splendor-og.png'],
   },
   robots: {
     index: true,
