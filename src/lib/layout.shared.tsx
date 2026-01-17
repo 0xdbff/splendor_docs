@@ -6,9 +6,6 @@ export function baseOptions(): BaseLayoutProps {
     themeSwitch: {
       enabled: false,
     },
-    searchToggle: {
-      enabled: false,
-    },
     links: [
       {
         type: 'main',
