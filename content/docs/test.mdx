@@ -1,0 +1,21 @@
+---
+title: Architecture
+description: Kernel primitives and system model for Splendor.
+---
+
+Splendor Kernel is a design-stage runtime concept for neuro-symbolic agent loops.
+These notes reflect current intent; implementation awaits the initial push.
+
+## Kernel loop
+
+A self-managed agent loop coordinates planning, action, observation, and
+reflection. Neural policies propose actions, while symbolic constraints and
+planners gate execution.
+
+## Core primitives
+
+- **State registry** for canonical world and agent state.
+- **Reward primitives** for shaping objectives across multi-step tasks.
+- **Policy contracts** for constraints, permissions, and safety gates.
+- **Execution budgets** for time, cost, and resource governance.
+
