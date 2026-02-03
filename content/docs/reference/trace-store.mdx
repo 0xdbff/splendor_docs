@@ -1,0 +1,47 @@
+---
+title: Trace Store
+description: Storage interface for ordered trace records.
+---
+
+Trace stores persist the ordered event stream for each run. The reference
+implementation is in-memory and intended for tests or lightweight integrations.
+
+## TraceRecord
+
+**Fields**
+- `run_id` (`String`): run identifier.
+- `sequence` (`u64`): monotonic sequence number.
+- `payload` (`serde_json::Value`): serialized trace event payload.
+- `recorded_at` (`OffsetDateTime`): timestamp at storage time.
+
+## TraceStore
+
+Synchronous storage interface:
+
+```
+append(run_id, payload) -> sequence
+read(run_id) -> Vec<TraceRecord>
+read_range(run_id, start, end) -> Vec<TraceRecord>
+```
+
+## AsyncTraceStore
+
+Async wrapper with the same semantics, returning futures for each operation.
+
+## InMemoryTraceStore
+
+Holds trace records in memory keyed by `run_id`. The `sequence` is derived from
+vector length at append time.
+
+## Example
+
+```rust
+use splendor_store::{InMemoryTraceStore, TraceStore};
+
+let store = InMemoryTraceStore::default();
+let seq = TraceStore::append(&store, "run-1", serde_json::json!({"event": 1}))
+    .expect("append");
+assert_eq!(seq, 0);
+let records = TraceStore::read(&store, "run-1").expect("read");
+assert_eq!(records.len(), 1);
+```

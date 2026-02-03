@@ -1,0 +1,16 @@
+{
+  "title": "Reference",
+  "description": "Kernel interfaces, stores, and runtime contracts.",
+  "pages": [
+    "index",
+    "core-objects",
+    "kernel-runtime",
+    "action-gateway",
+    "state-graph",
+    "state-store",
+    "trace-events",
+    "trace-store",
+    "serialization",
+    "python-bindings"
+  ]
+}

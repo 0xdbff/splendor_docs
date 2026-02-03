@@ -1,0 +1,79 @@
+---
+title: Action Gateway
+description: Kernel boundary for side-effectful action execution.
+---
+
+The action gateway is the kernel boundary for side-effectful operations. It
+accepts `ActionRequest` payloads, performs verification, executes adapters, and
+returns `ActionOutcome` results.
+
+## ActionId
+
+`ActionId` is a UUID-backed identifier assigned to each action submission.
+
+## ActionRequest
+
+**Fields**
+- `action_id` (`ActionId`): action identifier.
+- `action` (`Action`): requested operation.
+- `requested_at` (`OffsetDateTime`): submission timestamp.
+
+## ActionOutcome
+
+**Fields**
+- `action_id` (`ActionId`): action identifier.
+- `status` (`ActionStatus`): execution classification.
+- `output` (`Option<serde_json::Value>`): adapter output payload.
+- `error` (`Option<String>`): error message when denied or failed.
+- `completed_at` (`OffsetDateTime`): completion timestamp.
+
+`ActionStatus` variants:
+- `Executed` — action completed successfully.
+- `Denied` — verification denied the action.
+- `Failed` — adapter execution failed.
+
+## ActionGateway
+
+Synchronous gateway interface:
+
+```
+submit(ActionRequest) -> ActionOutcome
+```
+
+## AsyncActionGateway
+
+Async wrapper with identical semantics.
+
+## UnimplementedGateway
+
+Placeholder gateway that always returns `GatewayError::Unimplemented`.
+
+## GatewayError
+
+- `Unimplemented`
+- `VerificationFailed(reason)`
+- `AdapterFailed(reason)`
+
+## Example
+
+```rust
+use splendor_gateway::{ActionGateway, ActionRequest, UnimplementedGateway};
+use splendor_types::{Action, SideEffectClass};
+use time::OffsetDateTime;
+
+let gateway = UnimplementedGateway::default();
+let request = ActionRequest {
+    action_id: Default::default(),
+    action: Action {
+        name: "noop".into(),
+        params: serde_json::json!({}),
+        side_effect_class: SideEffectClass::ReadOnly,
+        cost_estimate: None,
+        required_permissions: vec![],
+        preconditions: vec![],
+        postconditions: vec![],
+    },
+    requested_at: OffsetDateTime::now_utc(),
+};
+assert!(ActionGateway::submit(&gateway, request).is_err());
+```

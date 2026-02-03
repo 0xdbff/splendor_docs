@@ -1,0 +1,24 @@
+---
+title: Python Bindings
+description: PyO3 module exposing Splendor bindings metadata.
+---
+
+The Python bindings expose a minimal PyO3 module that reports the compiled
+package version and ensures the kernel crate is linked.
+
+## bindings_version
+
+Returns the Cargo package version string for the bindings crate.
+
+## splendor_bindings module
+
+When built with the `python` feature, the module exports:
+
+- `__version__`: package version string.
+
+## Example
+
+```python
+import splendor_bindings
+print(splendor_bindings.__version__)
+```

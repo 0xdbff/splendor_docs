@@ -1,0 +1,56 @@
+---
+title: Kernel Runtime
+description: Runtime context for emitting ordered trace events.
+---
+
+The kernel runtime is a lightweight execution context used to emit ordered trace
+records. It owns a `RunId`, a monotonic sequence counter, and a trace sink.
+
+## KernelRuntimeConfig
+
+**Fields**
+- `trace_sink` (`Arc<dyn TraceSink>`): destination for serialized trace events.
+
+`KernelRuntimeConfig::default()` uses `StdoutTraceSink`.
+
+## KernelRuntime
+
+**Responsibilities**
+- Assign a `RunId` to the runtime instance.
+- Track event sequence numbers.
+- Emit `TraceEvent` payloads via the configured sink.
+
+**Methods**
+- `new(config)` creates a runtime without emitting events.
+- `boot(config)` creates a runtime and emits `LoopTickStarted`.
+- `record_event(kind)` serializes and emits a `TraceEvent`.
+
+## TraceSink
+
+`TraceSink` is the synchronous interface for recording events:
+```
+fn record(&self, event: &TraceEvent) -> Result<(), TraceError>
+```
+
+`AsyncTraceSink` provides an async-friendly equivalent using a future.
+
+### StdoutTraceSink
+
+`StdoutTraceSink` encodes events as JSON and writes to stdout. It implements
+both `TraceSink` and `AsyncTraceSink`.
+
+### TraceError
+
+`TraceError::Serialization` is returned when JSON encoding fails.
+
+## Example
+
+```rust
+use splendor_kernel::{KernelRuntime, KernelRuntimeConfig, TraceEventKind};
+
+let runtime = KernelRuntime::new(KernelRuntimeConfig::default());
+let event = runtime
+    .record_event(TraceEventKind::LoopTickCompleted { tick_id: 1 })
+    .expect("record event");
+assert_eq!(event.sequence, 0);
+```
