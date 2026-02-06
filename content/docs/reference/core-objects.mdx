@@ -3,6 +3,8 @@ title: Core Objects
 description: Canonical data structures defined in splendor-types.
 ---
 
+# Core Objects Reference
+
 This document describes the canonical data structures defined in
 `crates/splendor-types`.
 
@@ -55,6 +57,19 @@ TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
 - `units` (`String`): unit label (e.g., `ms`, `bytes`).
 - `amount` (`f64`): numeric estimate.
 
+## QuotaUsage
+
+`QuotaUsage` captures per-action usage for quota enforcement.
+
+**Fields**
+- `actions` (`u32`): action count for the tick.
+- `action_duration_ms` (`u64`): duration in milliseconds.
+- `filesystem_read_bytes` (`u64`): filesystem bytes read.
+- `filesystem_write_bytes` (`u64`): filesystem bytes written.
+- `network_read_bytes` (`u64`): network bytes read.
+- `network_write_bytes` (`u64`): network bytes written.
+- `http_requests` (`u32`): HTTP requests issued.
+
 ## Constraint
 
 `Constraint` defines hard or soft invariants enforced during a loop.
@@ -106,3 +121,12 @@ TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
 ```
 {algorithm}:{value}
 ```
+
+## TraceIntegrity
+
+`TraceIntegrity` records per-tick integrity chain metadata.
+
+**Fields**
+- `prev_event_hash` (`Option<ContentHash>`): hash of the previous trace event.
+- `event_hash` (`ContentHash`): hash of the current `LoopTickCompleted` event
+  computed with integrity omitted.

@@ -1,7 +1,9 @@
 ---
 title: State Store
-description: Persistence interfaces for state bytes, nodes, and snapshots.
+description: Storage interfaces for state data, nodes, and snapshots.
 ---
+
+# State Store
 
 State stores persist state bytes, state graph nodes, and snapshots. The storage
 interfaces are defined in `crates/splendor-store` and used by the kernel state
@@ -9,14 +11,14 @@ graph.
 
 ## Data Types
 
-| Type | Purpose |
-| --- | --- |
-| `StateData` | Serialized state bytes with an optional `content_type`. |
-| `StateDataRef` | UUID reference for stored state bytes. |
-| `StateNodeId` | Content hash identifying a state graph node. |
-| `StateMetadata` | Metadata stored with each state node. |
-| `StateNode` | Node payload containing parents, data reference, and hashes. |
-| `StateSnapshot` | Snapshot payload containing node ID and state bytes. |
+| Type            | Purpose                                                      |
+| --------------- | ------------------------------------------------------------ |
+| `StateData`     | Serialized state bytes with an optional `content_type`.      |
+| `StateDataRef`  | UUID reference for stored state bytes.                       |
+| `StateNodeId`   | Content hash identifying a state graph node.                 |
+| `StateMetadata` | Metadata stored with each state node.                        |
+| `StateNode`     | Node payload containing parents, data reference, and hashes. |
+| `StateSnapshot` | Snapshot payload containing node ID and `StateData`.         |
 
 ## StateStore
 

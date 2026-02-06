@@ -5,12 +5,14 @@
     "index",
     "core-objects",
     "kernel-runtime",
+    "run-config",
     "action-gateway",
     "state-graph",
     "state-store",
     "trace-events",
     "trace-store",
     "serialization",
+    "splendorctl",
     "python-bindings"
   ]
 }
