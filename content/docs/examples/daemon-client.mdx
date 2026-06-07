@@ -1,0 +1,50 @@
+---
+title: Daemon Client
+description: Control local runs through the runtime daemon API.
+---
+
+# Daemon Client Example
+
+The daemon client example demonstrates local run management through the runtime
+daemon API: create a run, append percepts, start a tick, inspect traces/state, and
+request inspect-only replay.
+
+## Start the local daemon
+
+```bash
+cargo run -p splendor-daemon
+```
+
+The local daemon binds to loopback and warns when explicit local development mode
+is active. Do not expose an unauthenticated daemon as a remote service.
+
+## Public workflow
+
+1. `POST /runs` with caller attribution and a signed scoped work order.
+2. `POST /runs/{run_id}/percepts` with an allowed percept schema and provenance.
+3. `POST /runs/{run_id}/start` to execute one local tick.
+4. `GET /runs/{run_id}/state-head` to read committed state metadata.
+5. `GET /runs/{run_id}/traces?redaction_policy=none` to inspect ordered trace records.
+6. `POST /runs/{run_id}/replay` to reconstruct facts without side effects.
+7. `POST /runs/{run_id}/stop` or `cancel` to end the run while preserving evidence.
+
+## CLI helper
+
+```bash
+splendorctl daemon request \
+  --method GET \
+  --url http://127.0.0.1:8077/health \
+  --token "$SPLENDOR_CALLER_TOKEN" \
+  --caller-credential ./caller-credential.json
+```
+
+For mutating requests, use a JSON body that includes caller credentials, audit
+attribution, and work-order or lifecycle data required by the endpoint.
+
+## What this proves
+
+- daemon callers are separate from tenant, agent, and run identity;
+- endpoint scopes authorize daemon API access;
+- signed work orders authorize run creation/resume;
+- `/actions` goes through the gateway and cannot self-attest verification;
+- replay does not invoke policies, gateways, verifiers, or adapters.

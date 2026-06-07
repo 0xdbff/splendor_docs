@@ -1,0 +1,26 @@
+---
+title: Examples
+description: Detailed public example workflows from the Splendor kernel.
+---
+
+# Examples
+
+These examples show how Splendor behaves at runtime: policies propose work,
+gateway and verifiers authorize execution, state commits are explicit, traces are
+append-only, and replay stays inspect-only by default.
+
+<Cards>
+  <Card title="Local Runtime" href="/docs/examples/local-runtime" description="Run a local loop with splendorctl and inspect state and traces." />
+  <Card title="Python SDK" href="/docs/examples/python-sdk" description="Write Python policies that propose actions without bypassing runtime checks." />
+  <Card title="Daemon Client" href="/docs/examples/daemon-client" description="Create runs, append percepts, read traces, and replay through the local daemon." />
+  <Card title="TypeScript Client" href="/docs/examples/typescript-client" description="Use TypeScript as a daemon/control-plane client, not a runtime executor." />
+  <Card title="Replay" href="/docs/examples/replay" description="Reconstruct a run without repeating side effects." />
+  <Card title="Multi-Agent" href="/docs/examples/multi-agent" description="Route messages and delegate to specialists with scoped authority." />
+  <Card title="Resident & Fleet" href="/docs/examples/resident-fleet" description="Register nodes, validate work orders, place work, sync traces, and hand off state." />
+  <Card title="Governance" href="/docs/examples/governance" description="Approval, escalation, circuit breaker, policy cache, and audit examples." />
+  <Card title="Physical & Edge" href="/docs/examples/physical-edge" description="Simulated high-level device actions, offline policy, trace sync, and safety verifiers." />
+  <Card title="External Control Planes" href="/docs/examples/external-control-plane" description="Provider-neutral governance bridge and Harmony-style integration." />
+</Cards>
+
+Examples are local and deterministic unless explicitly described otherwise. They
+are not production deployment, adapter certification, or robotics safety claims.

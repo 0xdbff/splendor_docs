@@ -1,0 +1,18 @@
+{
+  "title": "Examples",
+  "description": "Detailed public examples for Splendor runtime workflows.",
+  "pages": [
+    "index",
+    "local-runtime",
+    "python-sdk",
+    "daemon-client",
+    "typescript-client",
+    "replay",
+    "multi-agent",
+    "resident-fleet",
+    "governance",
+    "physical-edge",
+    "external-control-plane",
+    "advanced-fixtures"
+  ]
+}

@@ -1,0 +1,54 @@
+---
+title: Multi-Agent
+description: Typed local messages, orchestrator/specialist coordination, and scoped delegation.
+---
+
+# Multi-Agent Examples
+
+Splendor's local multi-agent examples show coordination without hidden shared
+state or broad inherited permissions.
+
+## Local message router
+
+`examples/local-multi-agent-router` registers two agent identities and sends a
+typed message from an orchestrator to a specialist.
+
+Validation:
+
+```bash
+cargo test -p splendor-kernel message_router
+```
+
+Expected message lifecycle:
+
+1. `message.queued`
+2. `message.delivered`
+3. `message.consumed`
+
+Rejected schemas, wrong recipients, wrong run scope, or expired messages emit
+failure lifecycle events instead of delivery.
+
+## Orchestrator and specialists
+
+`examples/local-orchestrator-specialists` hosts an orchestrator parent run and
+specialist child runs in one Splendor instance.
+
+Scenario:
+
+- orchestrator has broader authority, such as `query` and `publish`;
+- specialist receives narrower authority, such as `query` only;
+- parent creates a child run with explicit objective and delegated scope;
+- child response returns through typed task response messages;
+- replay reconstructs parent/child edges without executing adapters.
+
+## Scoped delegation
+
+`examples/local-specialist-scoped-delegation` focuses on permission laundering
+prevention. A specialist cannot inherit the parent's authority unless it is
+explicitly delegated and allowed by the specialist's own scope.
+
+## Replay
+
+`examples/local-multi-agent-replay` reconstructs message lifecycle events,
+parent/child run links, and delegation denials from stored traces. Replay does not
+re-send messages or start child runs.

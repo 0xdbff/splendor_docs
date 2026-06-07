@@ -1,0 +1,45 @@
+---
+title: Governance
+description: Approval, escalation, circuit breakers, policy cache, and audit examples.
+---
+
+# Governance Examples
+
+Governance examples show how Splendor pauses, denies, escalates, explains, or
+narrows authority without bypassing the Action Gateway.
+
+## Approval flow
+
+`examples/action-approval-flow` creates an approval-required action. Starting the
+run returns `NeedsApproval`, the adapter execution counter remains zero, and the
+run enters `waiting_for_approval`.
+
+Validation:
+
+```bash
+cargo test -p splendor-daemon approval_required_run_pauses_and_valid_grant_resumes_execution
+cargo test -p splendor-daemon approval_denial_expiry_and_wrong_scope_do_not_execute_adapter
+```
+
+A scoped grant permits re-evaluation through the gateway. Denied, expired,
+revoked, wrong-scope, or unsupported approval evidence fails closed.
+
+## Escalation and circuit breakers
+
+- `examples/escalation-basic` demonstrates deterministic intervention decisions
+  from runtime facts such as quota pressure or verifier uncertainty.
+- `examples/circuit-breaker-basic` denies matching actions before adapter
+  execution and records breaker evidence for replay.
+
+## Policy cache and audit
+
+- `examples/policy-cache-degraded-mode` demonstrates TTL and degraded-mode
+  behavior when policy authority expires or cannot refresh.
+- `examples/governance-audit-export` demonstrates traceable governance audit and
+  replay explanation.
+
+## What replay explains
+
+Replay can explain approval requests, grants, denials, expiries, revocations,
+intervention decisions, and circuit-breaker denials. It does not call approval
+systems, clear breakers, notify humans, or execute adapters.

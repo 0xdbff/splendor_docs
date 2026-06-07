@@ -1,0 +1,48 @@
+---
+title: Physical and Edge
+description: Simulated device profiles, offline policy, trace sync, safety verifiers, and cloud helper boundaries.
+---
+
+# Physical and Edge Examples
+
+Physical/edge examples are simulations for high-level bounded autonomy. They do
+not claim live hardware readiness, robotics safety certification, raw actuator
+control, or hard-real-time stabilization.
+
+## Simulation harness
+
+`examples/physical-simulation-harness` exercises the physical/edge contracts
+together:
+
+```bash
+cargo test -p splendor-kernel physical_harness --no-default-features
+```
+
+It demonstrates device profile validation, high-level robotics actions, gateway
+execution, safety denial before adapter execution, offline trace buffering,
+operator intervention, cloud-helper route proposals, local validation, and
+inspect-only replay.
+
+## Device profiles and policy cache
+
+- `examples/device-profiles` describes node kind, capabilities, safety
+  constraints, locality, and runtime mode.
+- `examples/offline-device-policy-cache` shows cached policy TTL and degraded
+  behavior while disconnected.
+- `examples/offline-trace-sync` shows local trace buffering and ordered reconnect
+  sync.
+
+## Robotics adapter and safety verifiers
+
+- `examples/simulated-drone-adapter` accepts only high-level actions such as
+  `inspect_zone`, `move_to_waypoint`, `dock`, and `return_to_base`.
+- `examples/simulated-safety-verifiers` denies unsafe actions before adapter
+  execution with trace-safe safety evidence.
+
+## Cloud helper pattern
+
+`examples/robot-cloud-route-planner` shows a cloud helper proposing a route. The
+local device runtime verifies the proposal before any bounded action is submitted
+to local middleware.
+
+Cloud helpers do not receive direct actuator authority.

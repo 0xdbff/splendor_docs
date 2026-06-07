@@ -1,0 +1,48 @@
+---
+title: Resident and Fleet Foundations
+description: Node registration, work orders, placement, trace sync, telemetry, and state handoff.
+---
+
+# Resident and Fleet Examples
+
+Resident/fleet examples describe how Splendor instances can be registered,
+described, selected, and audited without making telemetry or registration into
+runtime authority.
+
+## Node and instance registration
+
+`examples/resident-node-registration` registers a node and runtime instance with
+identity, capabilities, constraints, runtime version, hosted tenants, and health.
+
+Validation:
+
+```bash
+cargo test -p splendor-kernel node_registry
+```
+
+Registration emits management audit events such as `node.registered`,
+`instance.registered`, and heartbeat updates. It does not authorize actions.
+
+## Signed work orders
+
+`examples/signed-work-order-local-resident` validates a signed work order before a
+run starts. Valid work orders narrow allowed actions, adapters, permissions, data
+refs, and quotas. Bad signatures, expiry, revocation, or incompatible scope reject
+the run before percept collection, policy invocation, state commit, gateway
+submission, or adapter execution.
+
+## Placement
+
+`examples/placement-basic` demonstrates capability matching and explicit
+rejection reasons. Placement is a selection explanation, not a production
+autoscaler or authority source.
+
+## Remote messages, trace sync, and state handoff
+
+- `examples/two-instance-message` shows trace-linked remote message envelopes.
+- `examples/resident-trace-sync` shows ordered trace buffering and sync.
+- `examples/state-handoff-basic` shows explicit snapshot/reference handoff.
+- `examples/fleet-telemetry-basic` shows observational health and run telemetry.
+
+Telemetry and synced traces can explain what happened. They must not authorize
+future actions or repair invalid state.

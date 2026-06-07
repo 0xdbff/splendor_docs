@@ -1,0 +1,71 @@
+---
+title: Local Runtime
+description: Run a governed local loop with splendorctl.
+---
+
+# Local Runtime Example
+
+The local runtime example demonstrates the core loop:
+
+```text
+percept -> policy -> constraints -> gateway -> adapter -> outcome -> state commit -> trace
+```
+
+The policy proposes a filesystem action. The action is mediated by the gateway;
+the policy does not write files directly.
+
+## Run the example
+
+From a kernel checkout:
+
+```bash
+cargo build -p splendorctl
+rm -f ./examples/local-basic-loop/data/trace.db \
+      ./examples/local-basic-loop/data/state.db \
+      ./examples/local-basic-loop/data/tick_*.txt
+./target/debug/splendorctl run \
+  --config ./examples/local-basic-loop/config.yaml \
+  --cycles 1
+```
+
+## Inspect traces
+
+```bash
+./target/debug/splendorctl trace export \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --run 22222222-2222-2222-2222-222222222222
+```
+
+Expected trace shape includes run start, tick start, percept receipt, state load,
+policy invocation, action proposal, constraint evaluation, verification,
+execution or denial, outcome recording, state commit, and tick completion.
+
+## Inspect state
+
+```bash
+./target/debug/splendorctl state head \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --run 22222222-2222-2222-2222-222222222222
+```
+
+The state head points to the latest committed state node.
+
+## Compatible two-cycle variant
+
+`examples/single_agent_loop` uses the same local runtime shape with two cycles.
+It is useful for seeing repeated state/trace progression with the same gateway
+boundary.
+
+```bash
+./target/debug/splendorctl run \
+  --config ./examples/single_agent_loop/config.yaml \
+  --cycles 2
+```
+
+## What this proves
+
+- policy code proposes actions;
+- gateway verification runs before adapter execution;
+- state is committed explicitly;
+- trace records preserve the runtime order;
+- replay can inspect the run without writing the file again.

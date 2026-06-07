@@ -1,0 +1,39 @@
+---
+title: Advanced Fixtures
+description: Comprehensive deterministic fixtures for maintainers and implementers.
+---
+
+# Advanced Fixtures
+
+Advanced fixtures combine several primitive families in one deterministic journey.
+They are useful for maintainers and implementers, but they are not the best first
+step for new users.
+
+## Kernel journey through resident/fleet foundations
+
+`examples/kernel-e2e-through-0.03` describes a broad local deterministic fixture
+covering:
+
+- daemon API boundary;
+- local and remote message shapes;
+- resident node/instance identity;
+- signed work orders;
+- placement explanations;
+- scoped local delegation;
+- remote helper proposals;
+- trace sync;
+- state handoff;
+- replay causal graph;
+- observational fleet telemetry.
+
+## What it is for
+
+Use this fixture when reviewing how multiple runtime primitives fit together. It
+helps validate that gateway, verification, state, trace, replay, identity,
+work-order, message, and telemetry boundaries remain separate.
+
+## What it does not claim
+
+The fixture is not production transport security, global exactly-once delivery,
+distributed consensus, fleet autoscaling, governance UI, physical safety, or live
+hardware readiness.

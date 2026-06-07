@@ -1,0 +1,42 @@
+---
+title: External Control Planes
+description: Provider-neutral governance bridge and Harmony-style integration example.
+---
+
+# External Control Plane Example
+
+External control planes can integrate with Splendor through scoped work orders,
+approval decisions, trace exports, state commit references, and artifact
+provenance. Splendor remains responsible for runtime enforcement.
+
+## Harmony-style governance bridge
+
+`examples/harmony-governance-bridge` uses the provider-neutral external
+governance schema. Harmony is one possible provider; another control plane can use
+the same contract with different endpoint names.
+
+Validation:
+
+```bash
+cargo test -p splendor-types external_governance
+npm test
+```
+
+## Integration flow
+
+1. External control plane issues or serves a signed scoped work order.
+2. Splendor validates signature, expiry, revocation, tenant, agent, data refs,
+   placement, actions, adapters, permissions, and quotas.
+3. Splendor runs the loop and emits approval requests or outcomes as trace events.
+4. External control plane returns action-scoped approval grant or denial evidence.
+5. Splendor feeds that evidence into the approval verifier and gateway.
+6. Splendor exports trace-linked state and artifact references for indexing.
+
+## Rules
+
+- Do not pass broad user credentials to Splendor runs.
+- Approval grants must be action-scoped.
+- Artifact references should include run ID, state node ID, trace range, source
+  refs, and approval state.
+- External failures map to denial, pause, or intervention — never implicit allow.
+- Replay does not call the external provider or re-issue approvals.

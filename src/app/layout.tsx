@@ -34,6 +34,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: '/favicon.ico',
+  },
   openGraph: {
     title: 'Splendor Kernel',
     description:
@@ -74,8 +77,8 @@ export default function Layout({ children }: LayoutProps<'/'>) {
         <RootProvider
           theme={{
             attribute: 'class',
-            defaultTheme: 'dark',
-            enableSystem: false,
+            defaultTheme: 'system',
+            enableSystem: true,
           }}
         >
           {children}

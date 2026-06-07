@@ -1,0 +1,42 @@
+---
+title: Replay
+description: Reconstruct a local run without repeating side effects.
+---
+
+# Replay Example
+
+Replay reads persisted trace and state data and reconstructs runtime facts. It
+does not invoke policy code, route messages, call verifiers, submit gateway
+actions, or execute adapters by default.
+
+## Run replay
+
+After running the local basic loop:
+
+```bash
+./target/debug/splendorctl replay \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --state-db ./examples/local-basic-loop/data/state.db \
+  --run 22222222-2222-2222-2222-222222222222 \
+  --include-state
+```
+
+## Expected output
+
+Replay emits JSON Lines such as:
+
+- `replay_start`, including replay mode and `side_effects_replayed: false`;
+- reconstructed `tick` entries with percepts, action proposals, verification,
+  outcomes, and state hash;
+- causal graph information when message events are present;
+- governance, work-order, approval, or safety facts where they exist in trace.
+
+## Failure behavior
+
+Replay fails clearly when trace or state data is missing, corrupted, out of order,
+wrongly scoped, or references missing snapshots.
+
+## Safety boundary
+
+Replay must not rewrite files, call HTTP services, publish artifacts, re-deliver
+messages, resume runs, contact approval systems, or control physical devices.

@@ -1,0 +1,62 @@
+---
+title: Python SDK
+description: Use Python to propose actions while Splendor enforces runtime boundaries.
+---
+
+# Python SDK Example
+
+The Python SDK example shows the local ergonomic path for policies, perceptors,
+constraints, adapters, trace subscriptions, and replay.
+
+Python code proposes work. `KernelRuntime.run_once(...)` performs the runtime
+checks before adapter callbacks execute.
+
+## Run the example
+
+```bash
+PYTHONPATH=python python examples/python-sdk-basic/example.py
+```
+
+Expected output includes action statuses such as:
+
+```text
+statuses ['executed', 'denied', 'failed']
+```
+
+## Minimal shape
+
+```python
+from splendor import KernelRuntime
+
+runtime = KernelRuntime()
+tenant_id = runtime.create_tenant(
+    allowed_actions=["noop"],
+    allowed_adapters=["noop"],
+)
+agent_id = runtime.create_agent(tenant_id, snapshot_interval=1)
+
+runtime.register_perceptor(agent_id, lambda agent: [])
+runtime.register_adapter("noop", lambda action: {"output": {"ok": True}})
+runtime.register_policy(
+    agent_id,
+    lambda state, percepts: [
+        {"name": "noop", "adapter": "noop", "side_effect_class": "read_only", "params": {}}
+    ],
+)
+
+outcome = runtime.run_once(agent_id)
+assert outcome.action_outcomes[0].status == "executed"
+```
+
+## What to look for
+
+- tenant and agent creation before policy registration;
+- policy returns action candidates instead of calling adapters directly;
+- constraints and quotas can deny actions before adapter execution;
+- replay returns stored trace events without invoking policy or adapters again.
+
+## Boundary rule
+
+Do not put privileged filesystem, network, database, shell, webhook, artifact, or
+device side effects directly in policy callbacks. Route them as actions through
+the runtime.

@@ -1,0 +1,40 @@
+---
+title: TypeScript Client
+description: Use TypeScript as a daemon control-plane client.
+---
+
+# TypeScript Client Example
+
+The TypeScript example demonstrates `@splendor/types` and `@splendor/client` as
+schema-aligned daemon client packages. TypeScript does not execute policies,
+verifiers, adapters, state commits, trace persistence, or replay.
+
+## Build packages
+
+```bash
+npm install
+npm run build
+```
+
+## Configure daemon access
+
+```bash
+export SPLENDOR_DAEMON_URL=http://127.0.0.1:8077
+export SPLENDOR_TOKEN=<caller-token>
+```
+
+## Workflow demonstrated
+
+- create a run using a Rust-aligned `CreateRunRequest` shape;
+- pass signed work-order authorization and audit attribution;
+- append a percept;
+- start one local tick;
+- read trace events with an explicit redaction policy;
+- query state head;
+- request inspect-only replay.
+
+## Boundary rule
+
+The TypeScript client is a control-plane surface. It must not be treated as proof
+that an action was verified or executed. Runtime trace records and gateway
+outcomes carry that authority.
