@@ -1,0 +1,36 @@
+---
+title: Trace Sync and State Handoff
+description: Preserving trace and state continuity across resident runtime boundaries.
+---
+
+# Trace Sync and State Handoff
+
+Resident/fleet foundations use explicit trace sync and state handoff instead of
+hidden shared mutable memory.
+
+## Trace sync
+
+Trace sync moves ordered trace records from a local buffer to an index or
+aggregator. Sync must validate:
+
+- run identity;
+- contiguous sequence numbers;
+- event identity;
+- hash-chain continuity where available;
+- duplicate batches without duplicating records;
+- missing or corrupted segments as fail-closed errors.
+
+Trace sync does not repair, renumber, or rewrite trace records.
+
+## State handoff
+
+State handoff exports an explicit state snapshot or read-only reference. A
+receiver validates owner tenant/agent/run, state head, parent linkage, snapshot or
+state hash, trace linkage, and work-order authority before import or inspection.
+
+Failed import leaves receiver state unchanged.
+
+## Replay
+
+Replay can explain interruption, handoff, import, rejection, and resume facts. It
+does not re-sync traces, re-import snapshots as mutation, or execute adapters.

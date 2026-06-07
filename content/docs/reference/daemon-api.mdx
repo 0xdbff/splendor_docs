@@ -1,0 +1,54 @@
+---
+title: Daemon API
+description: Local runtime daemon endpoints and public client boundary.
+---
+
+# Daemon API
+
+The runtime daemon API is the local control boundary for Splendor runs. It exposes
+run lifecycle, percept append, trace/state inspection, inspect-only replay,
+health/capabilities, and gateway-mediated action submission.
+
+The daemon is local/foundation-oriented. It is not a production auth provider,
+fleet manager, browser runtime, or remote scheduling service.
+
+## Endpoint summary
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/runs` | Create a local run from a signed work order. |
+| `GET` | `/runs/{run_id}` | Inspect run status and metadata. |
+| `POST` | `/runs/{run_id}/start` | Execute one local scheduler tick. |
+| `POST` | `/runs/{run_id}/pause` | Pause a run. |
+| `POST` | `/runs/{run_id}/resume` | Resume a run when runtime conditions allow. |
+| `POST` | `/runs/{run_id}/stop` | Stop a run while preserving state/trace evidence. |
+| `POST` | `/runs/{run_id}/percepts` | Append structured percepts. |
+| `GET` | `/runs/{run_id}/state-head` | Read latest state node metadata. |
+| `GET` | `/runs/{run_id}/traces` | Read ordered traces with redaction policy. |
+| `POST` | `/runs/{run_id}/traces/export` | Export trace records and integrity metadata. |
+| `POST` | `/runs/{run_id}/replay` | Start inspect-only replay. |
+| `POST` | `/actions` | Submit an action through the gateway path. |
+| `GET` | `/health` | Read daemon health. |
+| `GET` | `/version` | Read runtime and schema version metadata. |
+| `GET` | `/capabilities` | Read local daemon capabilities. |
+
+## Stable error shape
+
+Daemon errors use a structured JSON shape:
+
+```json
+{
+  "code": "invalid_run",
+  "message": "run was not found",
+  "details": { "run_id": "..." }
+}
+```
+
+Gateway denials are usually action outcomes, not transport errors, because the
+gateway successfully evaluated the action and denied execution.
+
+## Client boundary
+
+Public clients should use the OpenAPI-described API, Python daemon client,
+TypeScript `@splendor/client`, or `splendorctl daemon request`. Clients must not
+call private runtime helpers to claim daemon/API behavior.

@@ -20,7 +20,8 @@ export const metadata: Metadata = {
     default: 'Splendor Kernel',
     template: '%s | Splendor Kernel',
   },
-  description: 'Design-stage docs for the Splendor Kernel. Initial code push pending.',
+  description:
+    'Public documentation for Splendor, a governed runtime substrate for autonomous agent loops, verified actions, explicit state, traces, and replay.',
   applicationName: 'Splendor Kernel',
   keywords: [
     'neuro-symbolic AI',
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Splendor Kernel',
-    description: 'Design-stage kernel docs. Initial code push pending.',
+    description:
+      'Public documentation for Splendor: governed agent loops, verified actions, explicit state, traces, and replay.',
     url: 'https://docs.splendor-k.org',
     siteName: 'Splendor Kernel',
     type: 'website',
@@ -51,7 +53,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Splendor Kernel',
-    description: 'Design-stage kernel docs. Initial code push pending.',
+    description:
+      'Public documentation for Splendor: governed agent loops, verified actions, explicit state, traces, and replay.',
     images: ['/og/splendor-og.png'],
   },
   robots: {

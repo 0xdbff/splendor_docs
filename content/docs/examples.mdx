@@ -1,0 +1,79 @@
+---
+title: Examples
+description: Public example paths from the kernel repository and what each one demonstrates.
+---
+
+# Examples
+
+The kernel repository includes runnable examples for local runtime behavior,
+SDK usage, daemon clients, messaging, governance, fleet foundations, and simulated
+physical/edge boundaries. Examples are intentionally local and deterministic.
+
+## Recommended starting path
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/local-basic-loop` | CLI-driven local loop, gateway verification, state commit, and trace export. |
+| `examples/single_agent_loop` | Two-cycle local runtime variant maintained for compatibility with the CLI config shape. |
+| `examples/python-sdk-basic` | Python policy callbacks that propose actions while the runtime enforces checks. |
+| `examples/replay-local-run` | Inspect-only replay without repeating side effects. |
+| `examples/daemon-client-local` | Local daemon lifecycle, percept append, traces, state-head, and replay. |
+| `examples/typescript-daemon-client` | TypeScript as a daemon/control-plane client, not an action executor. |
+
+## Multi-agent and messaging
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/local-multi-agent-router` | Typed local message routing and delivery states. |
+| `examples/local-orchestrator-specialists` | Orchestrator/specialist coordination inside one runtime instance. |
+| `examples/local-specialist-scoped-delegation` | Scoped delegation without permission laundering. |
+| `examples/local-multi-agent-replay` | Replay of message causality and parent/child run links. |
+
+## Resident and fleet-foundation examples
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/resident-node-registration` | Node and instance identity registration. |
+| `examples/signed-work-order-local-resident` | Signed work-order validation before run dispatch. |
+| `examples/placement-basic` | Capability matching and placement explanations. |
+| `examples/two-instance-message` | Remote message envelopes and trace-linked delivery. |
+| `examples/state-handoff-basic` | Explicit state handoff rather than hidden shared memory. |
+| `examples/resident-trace-sync` | Local trace buffering and central trace aggregation concepts. |
+| `examples/fleet-telemetry-basic` | Fleet health, run status, quota/denial signals, and non-authoritative telemetry. |
+
+## Governance examples
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/action-approval-flow` | Approval-required actions pause instead of executing. |
+| `examples/circuit-breaker-basic` | Circuit breakers deny matching actions by scope. |
+| `examples/escalation-basic` | Deterministic escalation for verifier uncertainty or runtime risk. |
+| `examples/policy-cache-degraded-mode` | Policy TTL and fail-closed degraded behavior. |
+| `examples/governance-audit-export` | Audit/replay explanation for governance decisions. |
+| `examples/harmony-governance-bridge` | Provider-neutral external governance/control-plane bridge pattern. |
+
+## Physical and edge simulations
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/device-profiles` | Device node profiles and high-level capability documents. |
+| `examples/offline-device-policy-cache` | Cached policy behavior during disconnection. |
+| `examples/offline-trace-sync` | Trace buffering and reconnect sync. |
+| `examples/simulated-drone-adapter` | High-level physical action adapter boundaries. |
+| `examples/simulated-safety-verifiers` | Local safety verifier evidence and denial paths. |
+| `examples/robot-cloud-route-planner` | Cloud helpers propose plans; local runtime verifies before action. |
+| `examples/physical-simulation-harness` | End-to-end physical/edge simulation using bounded actions and local safety checks. |
+
+Physical examples are simulations. They are not robotics certification claims and
+do not expose raw motor control, firmware safety bypass, hard real-time control,
+or direct actuator authority.
+
+## Advanced integration fixtures
+
+| Example | Use it to learn |
+| --- | --- |
+| `examples/kernel-e2e-through-0.03` | A comprehensive deterministic integration fixture for maintainers reviewing local, daemon, message, resident, trace, state, and telemetry boundaries together. Not a quickstart. |
+
+Advanced fixtures are useful for maintainers and implementers, but the recommended
+learning path starts with the local runtime, Python SDK, daemon client, and replay
+examples above.

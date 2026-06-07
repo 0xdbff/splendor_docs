@@ -1,0 +1,56 @@
+---
+title: Deployment
+description: Docker image usage and local deployment boundaries.
+---
+
+# Deployment
+
+Splendor provides Docker images for installing and smoke-testing the local runtime
+surface without requiring every toolchain on the host.
+
+## Pull an image
+
+The kernel package publishes branch, release, and commit-addressed image tags
+under GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/splendor-os/kernel:main
+docker pull ghcr.io/splendor-os/kernel:sha-<commit>
+```
+
+Use immutable `sha-<commit>` tags for reproducible automation.
+
+## Verify the CLI
+
+```bash
+docker run --rm ghcr.io/splendor-os/kernel:main
+```
+
+The default command reports the `splendorctl` version.
+
+## Run a local config in Docker
+
+Mount a working directory when you want trace and state artifacts on the host:
+
+```bash
+docker run --rm \
+  -v "$PWD:/workspace" \
+  -w /workspace \
+  ghcr.io/splendor-os/kernel:main \
+  splendorctl run --config ./splendor-run.yaml --cycles 1
+```
+
+## Daemon security note
+
+The image includes the local runtime daemon binary for development and inspection.
+Do not publish an unauthenticated daemon TCP listener from the image as a remote
+service. Remote or fleet-facing daemon communication requires authenticated
+caller identity, endpoint scopes, signed work orders, expiry, revocation, and
+trace/audit attribution.
+
+## Physical boundary
+
+Docker images and physical/edge examples are not hardware deployment or safety
+certification artifacts. They can run simulated high-level physical contracts; they
+do not provide live robotics readiness, motor control, firmware safety bypass, or
+hard-real-time control.

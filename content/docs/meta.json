@@ -1,4 +1,17 @@
 {
   "title": "Docs",
-  "pages": ["index", "reference"]
+  "pages": [
+    "index",
+    "getting-started",
+    "architecture",
+    "concepts",
+    "operations",
+    "security",
+    "deployment",
+    "sdk-api",
+    "integrations",
+    "compatibility",
+    "examples",
+    "reference"
+  ]
 }

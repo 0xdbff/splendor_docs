@@ -1,18 +1,59 @@
 ---
 title: Overview
-description: Design-stage notes for the Splendor Kernel.
+description: A public guide to Splendor, the governed runtime for autonomous agent loops.
 ---
 
-Splendor Kernel is in the design stage. This documentation tracks the current
-specification work and mirrors the reference notes from the main repository.
-Code is not released yet — wait for initial push.
+Splendor is a kernel-grade runtime substrate for governed autonomous agent loops.
+It gives agents explicit identities, versioned state, append-only traces, verified
+action boundaries, quotas, messages, replay, and governance hooks while running on
+ordinary Unix-like systems.
+
+Splendor does not replace your operating system, model stack, planner, or product
+UI. It sits underneath them as the enforcement and audit layer for persistent
+autonomy.
+
+## Runtime model
+
+```text
+Percepts -> Policy -> Constraints -> Gateway -> Verifiers -> Adapter -> Outcome -> State Commit -> Trace
+```
+
+Policies and SDK code propose work. The Rust runtime enforces identity,
+permissions, quotas, verifier decisions, state commits, trace emission, and safe
+replay behavior.
+
+## What Splendor standardizes
+
+- **Identity:** tenant, agent, run, tick, action, state, trace, message, work
+  order, approval, fleet, node, and instance IDs stay distinct.
+- **State:** every meaningful runtime state change is committed as a state graph
+  node or explicit state reference.
+- **Trace:** decisions, denials, outcomes, messages, approvals, state commits, and
+  replay facts are recorded as runtime contract data, not informal logs.
+- **Actions:** side effects are mediated by the Action Gateway and verifier chain
+  before adapters execute.
+- **Replay:** replay is inspect-only by default and does not repeat filesystem,
+  network, database, shell, webhook, artifact, or device side effects.
+- **Coordination:** typed messages and scoped delegation allow multi-agent work
+  without implicit permission inheritance.
+
+## What Splendor is not
+
+- Not a bare-metal operating system.
+- Not a chat-first agent framework.
+- Not a replacement for product control planes or enterprise admin UI.
+- Not a hard real-time robot, drone, PLC, or motor controller.
+- Not a universal distributed memory or consensus system.
 
 ## Documentation map
 
 <Cards>
-  <Card title="Reference" href="/docs/reference" />
-  <Card title="Core Objects" href="/docs/reference/core-objects" />
-  <Card title="Kernel Runtime" href="/docs/reference/kernel-runtime" />
-  <Card title="Trace Events" href="/docs/reference/trace-events" />
-  <Card title="Repository" href="https://github.com/splendor-os/kernel" />
+  <Card title="Getting Started" href="/docs/getting-started" description="Run a local loop, inspect traces, and replay safely." />
+  <Card title="Architecture" href="/docs/architecture" description="Understand the governed loop and system boundaries." />
+  <Card title="Core Concepts" href="/docs/concepts" description="Learn the public primitives Splendor standardizes." />
+  <Card title="Operations" href="/docs/operations" description="Operate the local runtime, daemon, fleet foundations, governance, and simulations." />
+  <Card title="Security" href="/docs/security" description="Understand caller credentials, work orders, gateway authority, and safe local dev." />
+  <Card title="SDK & API" href="/docs/sdk-api" description="Use Python, TypeScript, and the local daemon API safely." />
+  <Card title="Examples" href="/docs/examples" description="Find curated examples from the kernel repository." />
+  <Card title="Reference" href="/docs/reference" description="Public contracts for actions, state, traces, messages, replay, and CLI usage." />
 </Cards>

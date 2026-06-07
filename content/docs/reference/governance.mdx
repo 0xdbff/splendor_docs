@@ -1,0 +1,42 @@
+---
+title: Governance
+description: Approvals, interventions, escalation, circuit breakers, policies, and audit.
+---
+
+# Governance
+
+Governance is runtime state and verifier behavior. It pauses, denies, narrows, or
+explains authority; it does not create a side-effect path around the gateway.
+
+## Approval flow
+
+Approval policies can require scoped approval before an action executes. Missing
+approval evidence returns `NeedsApproval`; the adapter is not called. Resume from
+approval-waiting state requires scoped approval evidence and still re-enters the
+gateway/verifier chain.
+
+Denial, expiry, revocation, wrong scope, unsupported schema, or verifier
+uncertainty fails closed.
+
+## Escalation and intervention
+
+Escalation policies can turn runtime facts such as verifier uncertainty, repeated
+failure, quota pressure, policy expiry, approval timeout, or safety risk into a
+denial, pause, or intervention outcome.
+
+## Circuit breakers
+
+Circuit breakers deny matching actions by scope: tenant, agent, adapter, action,
+action class, node, instance, fleet, or global. Matching breakers prevent adapter
+execution and are replay-explainable.
+
+## Policy TTL and revocation
+
+Policy bundles can expire or be revoked. Missing, expired, or revoked policy must
+fail closed for affected side-effectful work.
+
+## Audit and replay
+
+Audit exports and replay explain approvals, denials, expiries, revocations,
+escalations, circuit breakers, and policy decisions without calling external
+approval systems or executing adapters.

@@ -1,0 +1,39 @@
+---
+title: Work Orders
+description: Signed, scoped authority for starting or resuming runs.
+---
+
+# Work Orders
+
+A work order authorizes a run objective and scope. It does not authorize side
+effects by itself; side effects still require gateway verification.
+
+## Public fields
+
+Work orders describe:
+
+- `work_order_id`;
+- tenant and agent identity;
+- objective;
+- allowed actions, adapters, and permissions;
+- data references;
+- quotas;
+- placement requirements;
+- issued and expiry times;
+- audience and revocation metadata;
+- signature.
+
+## Runtime rules
+
+- Unsigned, expired, revoked, malformed, wrong-tenant, wrong-audience, or
+  incompatible work orders are rejected before run start or resume.
+- Work orders may narrow tenant/agent authority; they must not broaden it.
+- Work-order acceptance or rejection is traceable.
+- Replay can inspect work-order facts but must not re-authorize a run from
+  historical work-order data.
+
+## Relationship to daemon credentials
+
+A caller credential authenticates the app or client. A work order authorizes the
+run scope. The Action Gateway authorizes side effects. No one layer replaces the
+others.

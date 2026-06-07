@@ -1,0 +1,43 @@
+---
+title: Messages
+description: Typed, trace-linked coordination between agents.
+---
+
+# Messages
+
+Messages let agents coordinate without sharing hidden mutable state or inheriting
+permissions implicitly.
+
+## Canonical shape
+
+```json
+{
+  "message_id": "msg_123",
+  "source_agent_id": "finance.orchestrator",
+  "target_agent_id": "finance.forecast",
+  "run_id": "run_456",
+  "schema": "splendor.message.task_request.v1",
+  "payload": {
+    "task": "forecast revenue for Q3",
+    "input_ref": "dataset:finance.revenue_monthly_v4"
+  },
+  "causal_parent": "trace_evt_789",
+  "requires_response": true,
+  "created_at": "2026-05-25T00:00:00Z"
+}
+```
+
+## Runtime rules
+
+- Messages are scoped to source agent, target agent, run, tenant, and schema.
+- Message payloads do not grant permissions.
+- Unsupported schemas are rejected before delivery.
+- Unauthorized recipients are rejected or recorded as delivery failures.
+- Message lifecycle events are trace-linked.
+- Replay reconstructs message causality without re-delivering messages.
+
+## Delegation
+
+Delegation uses messages plus explicit scope: allowed actions, allowed adapters,
+permissions, data refs, quotas, expiry, and trace linkage. Specialist agents do
+not inherit broad caller authority.

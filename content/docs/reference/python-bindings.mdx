@@ -1,17 +1,27 @@
 ---
 title: Python Bindings
-description: PyO3 bindings that expose kernel runtime types to Python.
+description: Python-facing runtime ergonomics and the Rust/Python boundary.
 ---
 
 # Python Bindings
 
-The Python bindings expose a thin PyO3 wrapper around the Python SDK runtime.
-They allow Python users to construct and control a `KernelRuntime` instance
-through a compiled extension module.
+Splendor provides Python-facing runtime ergonomics for local policies,
+perceptors, constraints, adapters, traces, and replay. Python is for proposal and
+domain logic; Rust remains responsible for runtime-critical enforcement.
 
-## splendor_bindings module
+## Python SDK
 
-When built with the `python` feature, the module exports:
+The primary public Python path is the SDK described in [SDK & API](/docs/sdk-api)
+and demonstrated by `examples/python-sdk-basic`.
+
+Python policy callbacks propose actions. `KernelRuntime.run_once` performs the
+runtime checks before adapter callbacks execute.
+
+## PyO3 bindings
+
+The compiled bindings expose a thin wrapper around the Python SDK runtime for
+projects that need a native extension boundary. When built with the Python
+feature, the module exports:
 
 - `KernelRuntime`: wrapper over `splendor.runtime.KernelRuntime`.
 - `KernelRuntimeConfig`: Python config class.
@@ -57,3 +67,8 @@ runtime.register_policy(
 runtime.run_once(agent_id)
 print(splendor_bindings.__version__)
 ```
+
+## Boundary rule
+
+Python code must not bypass Splendor's enforcement boundary for privileged side
+effects. Official examples route actions through the runtime and gateway path.

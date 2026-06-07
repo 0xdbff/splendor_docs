@@ -1,0 +1,80 @@
+---
+title: Compatibility
+description: Stable primitive line, schema evolution, adapter maturity, and known boundaries.
+---
+
+# Compatibility
+
+Splendor's 0.1 line defines the first stable primitive compatibility surface for
+documented schemas, SDK/API boundaries, operational behavior, conformance fixtures,
+adapter maturity metadata, migration policy, and public examples.
+
+It is not a 1.0 production support policy, production fleet scheduler, production
+remote daemon, adapter marketplace, physical safety certification, or hard
+real-time controller.
+
+## Stable public surface
+
+Compatibility covers documented public contracts:
+
+- primitive names, required fields, identity separation, extension rules, and enum
+  values;
+- schema versioning and deprecation policy;
+- named Python, TypeScript, Rust, and daemon API surfaces;
+- conformance report shape and fixture expectations;
+- adapter maturity metadata;
+- operational behavior documented for local runtime, daemon, resident/fleet
+  foundations, governance, and physical simulations.
+
+Undocumented internals, private helpers, local queue layouts, in-memory store
+details, and test fixtures outside conformance are not stable API.
+
+## Patch compatibility expectations
+
+Patch releases must not:
+
+- remove or rename stable required fields;
+- collapse distinct IDs;
+- convert fail-closed behavior into allow;
+- let side effects bypass the Action Gateway;
+- make replay execute side effects by default;
+- let extension metadata grant authority;
+- remove stable daemon endpoints without a documented replacement;
+- make SDK clients silently fall back to unauthenticated communication.
+
+Patch releases may add optional non-authorizing fields, stricter fail-closed
+validation, additional trace events for new behavior, or SDK convenience wrappers
+that preserve identity, scope, trace, gateway, verifier, quota, work-order, and
+replay semantics.
+
+## Adapter maturity levels
+
+Adapter maturity is an evidence model, not certification. Levels are:
+
+- `experimental`
+- `local-safe`
+- `network-safe`
+- `governance-aware`
+- `device-safe`
+
+A maturity level never grants authority by itself. Adapters still execute only
+behind the gateway and verifier chain.
+
+## Migration principles
+
+- Emit stable names such as `trace_event_id` and `state_node_id` in public data.
+- Preserve distinct identity fields.
+- Keep caller credentials, endpoint scopes, signed work orders, tenant/run policy,
+  and gateway verification as separate layers.
+- Treat unknown extension data as non-authorizing metadata.
+- Do not migrate old examples into stable docs unless side effects route through
+  the gateway.
+- Do not let migration tools execute side effects, grant approvals, issue work
+  orders, or mutate live state heads.
+
+## Known boundaries
+
+The 0.1 public line does not claim production OAuth/PKI, remote fleet scheduling,
+global consensus, native browser runtime, enterprise SaaS UI, adapter marketplace,
+production adapter certification, live hardware readiness, or robotics safety
+certification.

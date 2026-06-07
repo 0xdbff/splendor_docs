@@ -1,12 +1,13 @@
 ---
 title: Run Config
-description: Configuration schema for splendorctl run.
+description: Public YAML/JSON configuration shape for local splendorctl runs.
 ---
 
 # Run Config
 
-`splendorctl run` consumes a YAML/JSON config file that describes tenants,
-agents, policies, and adapter settings.
+`splendorctl run` consumes a YAML or JSON file describing tenants, agents,
+policies, state/trace storage, and local adapter settings. Run configs are for
+local runtime execution; remote/fleet authorization uses signed work orders.
 
 ## Top-level fields
 
@@ -58,11 +59,11 @@ Each perceptor entry emits a static percept:
 - `source` (string)
 - `detail` (string, optional)
 
-## Policy types
+## Policy examples
 
-### `static`
+### Static policy
 
-Executes a fixed list of actions every tick.
+Proposes a fixed list of actions each tick.
 
 ```
 policy:
@@ -76,10 +77,9 @@ policy:
         contents: "hi"
 ```
 
-### `increment`
+### Increment policy
 
-Increments a single-byte counter in state and optionally uses `{counter}`
-substitution in action params.
+Updates simple local state and can substitute the counter into action params.
 
 ```
 policy:
@@ -136,4 +136,12 @@ adapters:
 
 ## Example
 
-See `examples/single_agent_loop/config.yaml`.
+See `examples/local-basic-loop/config.yaml` in the kernel repository.
+
+## Security notes
+
+- Policies propose actions; adapters execute only after gateway verification.
+- Filesystem and HTTP adapters should be scoped to local sandboxes and allowlists.
+- Do not put secrets in run config examples.
+- For daemon or fleet-style execution, use authenticated callers and signed work
+  orders rather than broad local config authority.

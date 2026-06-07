@@ -1,0 +1,35 @@
+---
+title: Adapter Maturity
+description: Evidence-based adapter readiness levels without certification claims.
+---
+
+# Adapter Maturity
+
+Adapter maturity describes evidence required for different deployment classes. It
+is not a marketplace, legal certification, vendor approval workflow, production
+support promise, or physical safety certification.
+
+Adapters remain execution boundaries behind the Action Gateway. A maturity level
+never grants authority by itself.
+
+## Levels
+
+| Level | Meaning |
+| --- | --- |
+| `experimental` | Early adapter development with documented gaps. |
+| `local-safe` | Bounded local-resource side effects, such as sandboxed filesystem access. |
+| `network-safe` | Bounded network or external service access with explicit egress/data scope. |
+| `governance-aware` | Participates in approval, intervention, circuit-breaker, audit, and replay semantics. |
+| `device-safe` | Mediates high-level bounded physical/device actions through local middleware and safety verifiers. |
+
+## Common requirements
+
+Adapters above `experimental` should document gateway use, required verifiers,
+trace behavior, replay side-effect suppression, quotas, data scope, failure modes,
+and limitations.
+
+## Prohibited claims
+
+Maturity metadata must not claim production readiness, physical safety
+certification, marketplace approval, unrestricted host access, broad credentials,
+or direct physical actuator authority unless separately implemented and documented.

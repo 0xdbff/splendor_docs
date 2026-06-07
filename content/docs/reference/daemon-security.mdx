@@ -1,0 +1,62 @@
+---
+title: Daemon Security
+description: Caller identity, endpoint scopes, local development mode, and audit attribution.
+---
+
+# Daemon Security
+
+Daemon calls must preserve separate layers of authority:
+
+```text
+transport security -> caller authentication -> endpoint scopes -> signed work order -> tenant/agent/run checks -> gateway verification
+```
+
+## Caller identity
+
+Caller principals identify the app or client. They are separate from tenant,
+agent, run, node, and instance identities.
+
+Every non-dev request requires:
+
+- authenticated caller principal;
+- endpoint scopes;
+- tenant or fleet binding;
+- audience binding;
+- expiry;
+- revocation status;
+- audit attribution for mutating requests.
+
+## Endpoint scopes
+
+Representative scopes include:
+
+- `splendor.runs.create`
+- `splendor.runs.read`
+- `splendor.runs.start`
+- `splendor.runs.pause`
+- `splendor.runs.resume`
+- `splendor.runs.stop`
+- `splendor.percepts.append`
+- `splendor.actions.submit`
+- `splendor.traces.read`
+- `splendor.state.read`
+- `splendor.replay.create`
+- `splendor.messages.send`
+- `splendor.health.read`
+- `splendor.capabilities.read`
+
+Missing scopes fail closed.
+
+## Local development mode
+
+Insecure local mode is allowed only when explicitly enabled, bound to loopback or
+a Unix domain socket, visibly warned at startup, and unavailable for production,
+fleet, remote, or resident-node operation. Clients must not silently fall back to
+it.
+
+## Action submission
+
+`POST /actions` requires authenticated caller context or an internal runtime
+principal, endpoint scope, tenant/run binding, trace linkage, and gateway
+verification state. Caller-provided “already verified” claims are not accepted as
+authority.

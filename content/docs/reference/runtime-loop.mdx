@@ -1,0 +1,58 @@
+---
+title: Runtime Loop
+description: The governed loop that every Splendor run follows.
+---
+
+# Runtime Loop
+
+Splendor standardizes the loop that turns observations into verified outcomes:
+
+```text
+Percepts -> Policy -> Constraints -> Gateway -> Verifiers -> Adapter -> Outcome -> State Commit -> Trace
+```
+
+## Lifecycle
+
+1. A run starts with tenant, agent, run, and optional work-order context.
+2. A tick begins and collects structured percepts.
+3. The current state head is loaded for policy evaluation.
+4. Policy code proposes actions and optional state changes.
+5. Constraints evaluate the proposed work.
+6. The Action Gateway assigns action identity and starts verification.
+7. Required verifiers check policy, permissions, quotas, adapters, preconditions,
+   approvals, safety evidence, and scope where applicable.
+8. Only verified actions reach adapters.
+9. Outcomes are recorded as executed, denied, failed, approval needed, or
+   intervention needed.
+10. State commits explicitly to the state graph.
+11. Trace events record the tick and action facts in order.
+
+## Required trace order
+
+A complete successful tick records the following event classes:
+
+```text
+tick.started
+percepts.received
+state.loaded
+policy.invoked
+policy.completed
+constraints.evaluated
+verification.started
+verification.completed
+action.executed | action.denied | action.failed | action.needs_approval | action.needs_intervention
+outcome.recorded
+state.committed
+tick.completed
+```
+
+## Failure behavior
+
+- Policy or perceptor failure prevents action execution.
+- Constraint denial prevents gateway submission or adapter execution.
+- Gateway verifier denial prevents adapter execution.
+- Verifier uncertainty fails closed.
+- Trace persistence failure fails closed for side-effectful work when trace
+  durability is required before execution.
+- State commit failure prevents the next tick from advancing.
+- Replay reconstructs recorded facts and does not repeat side effects.

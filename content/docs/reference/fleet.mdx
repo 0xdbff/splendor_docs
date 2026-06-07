@@ -1,0 +1,37 @@
+---
+title: Fleet Foundations
+description: Node identity, capability documents, placement hints, work orders, and telemetry.
+---
+
+# Fleet Foundations
+
+Fleet primitives describe resident nodes and runtime instances without making
+telemetry or registration into action authority.
+
+## Node and instance registry
+
+A node registration describes a physical, virtual, or logical host with node ID,
+kind, scope, capabilities, constraints, runtime version, and health metadata.
+
+An instance registration describes a concrete Splendor runtime process with
+instance ID, parent node, runtime mode, hosted tenants, supported features,
+runtime version, and health.
+
+Registration and heartbeat events are management metadata. They do not authorize
+runs or actions.
+
+## Placement
+
+Placement matches work-order requirements against node capabilities, locality,
+runtime mode, health, and constraints. Placement explanations should preserve why
+a target was selected or rejected.
+
+Placement is a foundation primitive, not a production autoscaler or global
+scheduler.
+
+## Fleet telemetry
+
+Telemetry reports health, run status, quota signals, denial signals, trace sync
+status, and failures. Telemetry is observational only. It must not authorize
+placement, work orders, gateway decisions, verifier results, approvals, or adapter
+execution.

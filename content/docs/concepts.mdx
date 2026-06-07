@@ -1,0 +1,77 @@
+---
+title: Core Concepts
+description: The public primitives that make Splendor runs inspectable and governable.
+---
+
+# Core Concepts
+
+Splendor makes autonomous runtime behavior explicit. The same primitives appear in
+the local runtime, SDKs, daemon API, examples, traces, and replay outputs.
+
+## Identity
+
+Splendor keeps runtime identities separate so authority cannot be blurred:
+
+| Primitive | Purpose |
+| --- | --- |
+| Tenant | Policy, data, quota, and audit boundary. |
+| Agent | Autonomous runtime identity inside a tenant. |
+| Runtime context | Isolated local execution context for an agent. |
+| Run | One execution of an objective. |
+| Tick | One cycle of the governed loop. |
+| Action | One proposed operation mediated by the gateway. |
+| State node | Versioned state commit or explicit state reference. |
+| Trace event | Append-only event in a run trace stream. |
+| Message | Typed coordination object between agents. |
+| Work order | Signed, scoped authority to start or resume a run. |
+| Approval | Scoped governance evidence consumed by verifiers. |
+
+## Percepts and policies
+
+Percepts are structured observations. Policies receive state and percepts, then
+propose actions and state changes. Policies do not execute privileged side
+effects directly.
+
+## Constraints and verifiers
+
+Constraints describe rules and invariants. Verifiers enforce runtime boundaries:
+tenant policy, agent permissions, adapter allowlists, quotas, preconditions,
+network/filesystem scope, approval state, safety evidence, and policy validity.
+
+When a required verifier cannot decide safely, Splendor fails closed as denial,
+approval needed, intervention needed, or pause depending on the runtime context.
+
+## Action Gateway
+
+The Action Gateway is the boundary between proposed work and real side effects.
+Only verified actions reach adapters. Denied, approval-required, intervention, or
+failed actions are traceable outcomes.
+
+## State graph
+
+Agent state is explicit and versioned. State commits identify the tenant, agent,
+run, parent state node, state hash, trace linkage, and timestamp. Hidden mutable
+state must not affect runtime behavior without a state commit or reference.
+
+## Trace and replay
+
+Traces are runtime contract data. A successful tick records percept intake,
+policy invocation, action proposals, constraint evaluation, verification, action
+outcomes, state commit, and completion.
+
+Replay reconstructs behavior from trace and state evidence. By default, replay
+does not call adapters, resend messages, publish artifacts, contact approval
+systems, or control devices.
+
+## Messages and delegation
+
+Messages let agents coordinate through typed, trace-linked payloads. Delegation is
+scoped by allowed actions, adapters, permissions, data references, quotas, expiry,
+and trace linkage. Specialist agents do not inherit broad caller authority by
+default.
+
+## Work orders and governance
+
+Work orders authorize runs. Governance objects such as approvals, circuit
+breakers, policy TTLs, and audit exports are verifier inputs and traceable runtime
+state. They do not replace the Action Gateway.

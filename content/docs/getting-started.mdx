@@ -1,0 +1,78 @@
+---
+title: Getting Started
+description: Run a local Splendor loop and inspect the resulting state, trace, and replay output.
+---
+
+# Getting Started
+
+The fastest way to understand Splendor is to run a local loop from the kernel
+repository. This path uses the CLI, a deterministic example config, SQLite-backed
+state/trace stores, and inspect-only replay.
+
+## Prerequisites
+
+- Rust and Cargo.
+- A checkout of the kernel repository: `https://github.com/splendor-os/kernel`.
+- Optional: Python for SDK examples and Node.js for TypeScript client examples.
+
+## Build the CLI
+
+```bash
+cargo build -p splendorctl
+```
+
+## Run one local tick
+
+```bash
+./target/debug/splendorctl run \
+  --config ./examples/local-basic-loop/config.yaml \
+  --cycles 1
+```
+
+The local example proposes a filesystem action, verifies it through the gateway,
+writes inside the example sandbox, commits state, and records trace events.
+
+## Export traces
+
+```bash
+./target/debug/splendorctl trace export \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --run 22222222-2222-2222-2222-222222222222
+```
+
+Trace output is JSON Lines. It includes the ordered runtime facts needed for
+debugging and audit: percepts, policy invocation, action proposals, verifier
+results, outcomes, state commits, and tick completion.
+
+## Inspect the state head
+
+```bash
+./target/debug/splendorctl state head \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --run 22222222-2222-2222-2222-222222222222
+```
+
+The state head points to the latest committed state node for the run.
+
+## Replay safely
+
+```bash
+./target/debug/splendorctl replay \
+  --db ./examples/local-basic-loop/data/trace.db \
+  --state-db ./examples/local-basic-loop/data/state.db \
+  --run 22222222-2222-2222-2222-222222222222
+```
+
+Replay reconstructs the run from trace and state evidence. It does not call the
+filesystem adapter again.
+
+## Try SDK and API examples
+
+After the local CLI path, continue with:
+
+- Python SDK: `PYTHONPATH=python python examples/python-sdk-basic/example.py`
+- Local daemon example: `examples/daemon-client-local/README.md`
+- TypeScript daemon client: `examples/typescript-daemon-client/README.md`
+
+Local daemon examples use explicit loopback development mode. Do not expose an
+unauthenticated daemon on a public network.

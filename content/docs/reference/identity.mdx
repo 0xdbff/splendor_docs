@@ -1,0 +1,41 @@
+---
+title: Identity
+description: Canonical identity fields and why Splendor keeps them separate.
+---
+
+# Identity
+
+Splendor identity fields are runtime contract data. One ID must not stand in for a
+different concept, because identity separation prevents permission laundering,
+trace confusion, unsafe replay, and accidental state ownership changes.
+
+## Canonical IDs
+
+| Field | Scope |
+| --- | --- |
+| `fleet_id` | Governed fleet boundary. |
+| `node_id` | Physical, virtual, or logical host node. |
+| `instance_id` | Concrete Splendor runtime process. |
+| `tenant_id` | Tenant authority boundary. |
+| `agent_id` | Autonomous runtime identity. |
+| `runtime_context_id` | Isolated local execution context. |
+| `run_id` | One execution instance and trace stream. |
+| `tick_id` | Tick counter scoped by run. |
+| `action_id` | One proposed action. |
+| `state_node_id` | State graph node identity. |
+| `trace_event_id` | Append-only trace event identity. |
+| `message_id` | Typed inter-agent message identity. |
+| `work_order_id` | Signed run-authority object. |
+| `approval_id` | Scoped approval or denial evidence. |
+| `artifact_id` | Produced or referenced artifact. |
+
+## Trace identity context
+
+Trace events carry the run identity plus optional tenant, agent, tick, action,
+state, message, work-order, approval, fleet, node, and instance context where
+applicable. This lets replay and audit reconstruct why a decision happened.
+
+## Failure behavior
+
+Malformed, nil, mismatched, or wrong-scope identity fails closed before execution,
+delivery, state import, or replay continuation.

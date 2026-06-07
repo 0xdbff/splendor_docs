@@ -5,115 +5,71 @@ description: Gateway boundary for verified action execution.
 
 # Action Gateway
 
-The action gateway is the kernel boundary for side-effectful operations. It
-accepts `ActionRequest` payloads, performs verification, executes adapters, and
-returns `ActionOutcome` results.
+The Action Gateway is Splendor's side-effect boundary. It accepts action requests,
+checks identity and verifier evidence, executes adapters only when allowed, and
+records traceable outcomes.
 
-## ActionId
+## Action request
 
-`ActionId` is a UUID-backed identifier assigned to each action submission.
+An action request includes:
 
-## ActionRequest
+- `action_id`
+- `tenant_id`
+- `agent_id`
+- `run_id`
+- requested action name and parameters
+- adapter identifier, if applicable
+- required permissions
+- quota usage estimate
+- preconditions and postconditions
+- optional approval or safety evidence
+- timestamp and trace linkage
 
-**Fields**
-- `action_id` (`ActionId`): action identifier.
-- `tenant_id` (`TenantId`): tenant owning the action.
-- `agent_id` (`AgentId`): agent submitting the action.
-- `action` (`Action`): requested operation.
-- `adapter` (`Option<String>`): adapter identifier requested.
-- `quota_usage` (`QuotaUsage`): quota usage estimate.
-- `satisfied_preconditions` (`Vec<String>`): preconditions satisfied by state.
-- `requested_at` (`OffsetDateTime`): submission timestamp.
+Approval evidence, work-order fields, or SDK metadata never bypass the gateway.
+They are inputs to verifier decisions.
 
-## ActionOutcome
+## Outcome statuses
 
-**Fields**
-- `action_id` (`ActionId`): action identifier.
-- `status` (`ActionStatus`): execution classification.
-- `verification` (`VerificationResult`): pre-execution verification result.
-- `post_verification` (`Option<VerificationResult>`): post-execution verification result.
-- `output` (`Option<serde_json::Value>`): adapter output payload.
-- `error` (`Option<String>`): error message when denied or failed.
-- `completed_at` (`OffsetDateTime`): completion timestamp.
+| Status | Meaning |
+| --- | --- |
+| `Executed` | Verification passed and the adapter completed. |
+| `Denied` | Verification denied the action; adapter did not execute. |
+| `NeedsApproval` | A scoped approval is required; adapter did not execute. |
+| `NeedsIntervention` | Runtime or verifier uncertainty failed closed; adapter did not execute before intervention. |
+| `Failed` | Adapter execution was attempted after verification but failed. |
 
-`ActionStatus` variants:
-- `Executed` — action completed successfully.
-- `Denied` — verification denied the action.
-- `Failed` — adapter execution failed.
+## Required verifier categories
 
-## ActionAdapter
+- tenant and agent scope;
+- allowed action and adapter;
+- required permissions;
+- quotas and budget;
+- preconditions and postconditions;
+- data, filesystem, and network scope where applicable;
+- approval and governance state where applicable;
+- safety evidence for high-level physical actions;
+- policy TTL or revocation where applicable.
 
-`ActionAdapter::execute(request)` performs the side effect and returns an
-`AdapterResult`.
+If a required verifier cannot safely decide, the gateway fails closed.
 
-**AdapterResult fields**
-- `output` (`serde_json::Value`): adapter output payload.
-- `satisfied_postconditions` (`Vec<String>`): postconditions satisfied by execution.
+## Adapter boundary
 
-## TenantAccess
+Adapters are the only boundary that executes verified side effects. Examples
+include filesystem, HTTP, artifact, governance, and simulated physical adapters.
+Official SDK and client examples must not call adapters directly for privileged
+operations.
 
-`TenantAccess` supplies permission and quota checks for the gateway:
+## Physical action boundary
 
-- `verify_policy(tenant_id, action, adapter) -> VerificationResult`
-- `verify_quota(tenant_id, agent_id, usage) -> VerificationResult`
+High-level physical actions can be modeled and verified. Low-level actuator,
+firmware bypass, raw motor, emergency-stop bypass, or hard real-time control
+actions are not valid direct Splendor actions.
 
-## InvariantEvaluator
+## Trace behavior
 
-`InvariantEvaluator` checks action pre/postconditions against satisfied
-conditions.
+The gateway records verification start, verification completion, action outcome,
+post-verification where applicable, and outcome recording. Denials and failures
+must be inspectable in replay.
 
-## VerifiedActionGateway
-
-`VerifiedActionGateway` runs permission, quota, and invariant checks before
-executing adapters and evaluates postconditions after execution.
-
-## ActionGateway
-
-Synchronous gateway interface:
-
-```
-submit(ActionRequest) -> ActionOutcome
-```
-
-## AsyncActionGateway
-
-Async wrapper with identical semantics.
-
-## UnimplementedGateway
-
-Placeholder gateway that always returns `GatewayError::Unimplemented`.
-
-## GatewayError
-
-- `Unimplemented`
-- `VerificationFailed(reason)`
-- `AdapterFailed(reason)`
-
-## Example
-
-```rust
-use splendor_gateway::{ActionGateway, ActionRequest, UnimplementedGateway};
-use splendor_types::{Action, SideEffectClass};
-use time::OffsetDateTime;
-
-let gateway = UnimplementedGateway::default();
-let request = ActionRequest {
-    action_id: Default::default(),
-    tenant_id: splendor_types::TenantId::new(),
-    agent_id: splendor_types::AgentId::new(),
-    action: Action {
-        name: "noop".into(),
-        params: serde_json::json!({}),
-        side_effect_class: SideEffectClass::ReadOnly,
-        cost_estimate: None,
-        required_permissions: vec![],
-        preconditions: vec![],
-        postconditions: vec![],
-    },
-    adapter: None,
-    quota_usage: splendor_types::QuotaUsage::single_action(),
-    satisfied_preconditions: vec![],
-    requested_at: OffsetDateTime::now_utc(),
-};
-assert!(ActionGateway::submit(&gateway, request).is_err());
-```
+Replay does not call the gateway or adapters again; it explains recorded gateway
+decisions from trace and state evidence.

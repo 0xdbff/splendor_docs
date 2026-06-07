@@ -14,8 +14,18 @@ export function baseOptions(): BaseLayoutProps {
       },
       {
         type: 'main',
-        text: 'Design',
-        url: '/docs/test',
+        text: 'Examples',
+        url: '/docs/examples',
+      },
+      {
+        type: 'main',
+        text: 'Operations',
+        url: '/docs/operations',
+      },
+      {
+        type: 'main',
+        text: 'GitHub',
+        url: 'https://github.com/splendor-os/kernel',
       },
     ],
     nav: {

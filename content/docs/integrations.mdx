@@ -1,0 +1,55 @@
+---
+title: Integrations
+description: How external control planes can integrate without owning runtime enforcement.
+---
+
+# Integrations
+
+External systems can integrate with Splendor as control planes, approval sources,
+artifact indexers, or management clients. They must not replace Splendor's runtime
+enforcement boundary.
+
+## Provider-neutral governance bridge
+
+An external governance bridge can provide:
+
+- scoped signed work orders;
+- action-scoped approval grants and denials;
+- trace-linked artifact references;
+- external audit or approval UX.
+
+Splendor remains responsible for:
+
+- work-order validation;
+- approval verifier behavior;
+- Action Gateway enforcement;
+- state graph commits;
+- append-only trace events;
+- replay and audit reconstruction.
+
+## Harmony pattern
+
+Harmony or another enterprise platform may own product concerns such as
+organization UI, workspaces, approval queues, artifact registry UX, connector UX,
+policy authoring UI, billing, or admin consoles.
+
+Splendor owns runtime concerns: tenant, agent, run, tick, action, state, trace,
+message, work-order, and approval identity; gateway enforcement; verifier chains;
+state commits; traces; replay; and scoped delegation.
+
+## Rules for external systems
+
+- Do not pass broad user credentials to Splendor runs.
+- Issue signed, scoped work orders with data refs, allowed actions, adapters,
+  permissions, quotas, expiry, and audience.
+- Map approval decisions into scoped Splendor approval evidence.
+- Keep artifact references linked to run ID, state node ID, trace range, approval
+  state, and source refs.
+- Treat replay as inspect-only; do not call external systems or execute actions
+  during replay.
+
+## Failure behavior
+
+Malformed bridge payloads, broad approval grants, credential-like context fields,
+missing signatures, wrong scope, expired authority, and external adapter failures
+must fail closed as denial, pause, or intervention — never as implicit allow.

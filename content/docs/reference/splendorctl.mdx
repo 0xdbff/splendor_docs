@@ -1,139 +1,67 @@
 ---
 title: splendorctl
-description: Command-line interface for running kernel workflows.
+description: Command-line workflows for local runs, traces, state, replay, and daemon requests.
 ---
 
-# Run Config
+# splendorctl
 
-`splendorctl run` consumes a YAML/JSON config file that describes tenants,
-agents, policies, and adapter settings.
+`splendorctl` is the local command-line interface for Splendor runtime workflows.
+It is useful for quickstarts, examples, trace inspection, state inspection, and
+safe replay.
 
-## Top-level fields
+## Version
 
-- `trace_db` (string, required): SQLite path for trace events.
-- `state_db` (string, required): SQLite path for state snapshots.
-- `run_id` (string, optional): UUID to use for all agents unless overridden.
-- `tick_budget_ms` (number, optional): tick budget in milliseconds.
-- `tick_interval_ms` (number, optional): pacing interval per scheduler cycle.
-- `cycles` (number, optional): default cycles to run when `--cycles` is omitted.
-- `tenants` (array, required): tenant definitions.
-- `agents` (array, required): agent definitions.
-- `adapters` (object, optional): adapter configuration.
-
-## Tenant fields
-
-- `id` (string, required): UUID for the tenant.
-- `allowed_actions` (array, required): action names allowed for this tenant.
-- `allowed_adapters` (array, required): adapter ids allowed for this tenant.
-- `allowed_permissions` (array, optional): permissions allowlist.
-- `quotas` (object, optional): quota limits.
-
-### Quota fields
-
-- `max_actions_per_tick` (number)
-- `max_action_duration_ms` (number)
-- `max_filesystem_read_bytes` (number)
-- `max_filesystem_write_bytes` (number)
-- `max_network_read_bytes` (number)
-- `max_network_write_bytes` (number)
-- `max_http_requests_per_minute` (number)
-
-## Agent fields
-
-- `tenant_id` (string, required): UUID that matches a tenant.
-- `id` (string, optional): UUID for the agent.
-- `run_id` (string, optional): UUID for the agent run (overrides top-level).
-- `snapshot_interval` (number, optional): snapshot every N ticks.
-- `initial_state` (string, optional): initial state bytes (UTF-8 string).
-- `resume` (bool, optional): resume from last snapshot in trace store.
-- `percepts` (array, optional): static percept list.
-- `policy` (object, required): policy configuration.
-
-### Percepts
-
-Each perceptor entry emits a static percept:
-
-- `schema` (string)
-- `payload` (object)
-- `source` (string)
-- `detail` (string, optional)
-
-## Policy types
-
-### `static`
-
-Executes a fixed list of actions every tick.
-
-```
-policy:
-  type: static
-  actions:
-    - name: write_file
-      adapter: filesystem
-      side_effect_class: filesystem
-      params:
-        path: "hello.txt"
-        contents: "hi"
+```bash
+splendorctl --version
 ```
 
-### `increment`
+## Run a local config
 
-Increments a single-byte counter in state and optionally uses `{counter}`
-substitution in action params.
-
-```
-policy:
-  type: increment
-  action:
-    name: write_file
-    adapter: filesystem
-    side_effect_class: filesystem
-    params:
-      path: "tick_{counter}.txt"
-      contents: "hello {counter}"
+```bash
+splendorctl run --config ./examples/local-basic-loop/config.yaml --cycles 1
 ```
 
-## Action fields
+This starts the local loop, invokes policy, submits actions through the gateway,
+commits state, and writes trace events.
 
-- `name` (string, required)
-- `adapter` (string, optional): adapter id override.
-- `params` (object, required)
-- `side_effect_class` (string, optional): `filesystem`, `network`, `read_only`, `external`.
-- `required_permissions` (array, optional)
-- `preconditions` (array, optional)
-- `postconditions` (array, optional)
-- `usage` (object, optional): quota usage hints.
-- `satisfied_preconditions` (array, optional)
+## Export traces
 
-### Usage fields
-
-- `actions` (number)
-- `action_duration_ms` (number)
-- `filesystem_read_bytes` (number)
-- `filesystem_write_bytes` (number)
-- `network_read_bytes` (number)
-- `network_write_bytes` (number)
-- `http_requests` (number)
-
-## Adapter config
-
-```
-adapters:
-  filesystem:
-    base_dir: ./data
-    max_read_bytes: 1048576
-    max_write_bytes: 1048576
-    max_list_entries: 1000
-  http:
-    allowed_domains:
-      - example.com
-    allowed_methods:
-      - GET
-    max_request_bytes: 1048576
-    max_response_bytes: 1048576
-    timeout_ms: 5000
+```bash
+splendorctl trace export --db ./examples/local-basic-loop/data/trace.db --run <run-id>
 ```
 
-## Example
+Trace export emits JSON Lines of append-only trace records.
 
-See `examples/single_agent_loop/config.yaml`.
+## Inspect state head
+
+```bash
+splendorctl state head --db ./examples/local-basic-loop/data/trace.db --run <run-id>
+```
+
+The state head is the latest committed state node for the run.
+
+## Replay
+
+```bash
+splendorctl replay --db ./examples/local-basic-loop/data/trace.db --state-db ./examples/local-basic-loop/data/state.db --run <run-id>
+```
+
+Replay reconstructs the run without calling adapters again.
+
+## Daemon request helper
+
+`splendorctl daemon request` can send local development requests to the runtime
+daemon. Use it only with explicit loopback local development settings unless the
+daemon is configured with authenticated production-grade transport and caller
+credentials.
+
+```bash
+splendorctl daemon request \
+  --method GET \
+  --url http://127.0.0.1:8077/health \
+  --token "$SPLENDOR_CALLER_TOKEN" \
+  --caller-credential ./caller-credential.json
+```
+
+Daemon tokens authenticate callers; they are not action authority. Side effects
+still require signed work-order scope and gateway verification.

@@ -1,27 +1,45 @@
 ---
 title: Core Objects
-description: Canonical data structures defined in splendor-types.
+description: Stable public primitives used across Splendor runtime surfaces.
 ---
 
 # Core Objects Reference
 
-This document describes the canonical data structures defined in
-`crates/splendor-types`.
+Splendor's public object model is intentionally small and explicit. The same
+concepts appear in local runs, daemon requests, SDK callbacks, trace events,
+state commits, and replay output.
 
-## Identity Types
+## Stable primitives
 
-| Type | Backing | Purpose | Determinism |
-| --- | --- | --- | --- |
-| `TenantId` | UUID v4 | Tenant boundary identifier. | Random per instance. |
-| `AgentId` | UUID v4 | Agent identity within a tenant. | Random per instance. |
-| `RunId` | UUID v4 | Runtime execution session identifier. | Random per instance. |
-| `TraceId` | UUID v5 | Trace event identifier derived from `RunId` + sequence. | Deterministic from inputs. |
-| `SnapshotId` | `ContentHash` | Identifier for snapshot bytes. | Deterministic from bytes. |
+| Primitive | Purpose |
+| --- | --- |
+| Tenant | Authority boundary for policy, quotas, data scope, and audit. |
+| Agent | Autonomous runtime identity inside a tenant. |
+| Run | One execution of an objective. |
+| Tick | One cycle inside a run. |
+| Percept | Structured observation delivered to policy. |
+| Action | Proposed operation mediated by the gateway. |
+| StateNode | Versioned state commit or explicit state reference. |
+| TraceEvent | Append-only runtime event in a run trace stream. |
+| Message | Typed agent-to-agent coordination object. |
+| WorkOrder | Signed, scoped authority to start or resume a run. |
+| Approval | Scoped governance evidence consumed by verifiers. |
+| Policy / Constraint / Verifier / Adapter | Runtime interfaces for proposal, rule evaluation, enforcement, and execution. |
+| Feedback / Reward | Evaluation signals recorded after outcomes. |
 
-### TraceId derivation
+## Identity rules
+
+Do not overload IDs. Public schemas keep these identity concepts distinct:
+
+```text
+fleet_id, node_id, instance_id, tenant_id, agent_id,
+runtime_context_id, run_id, tick_id, action_id,
+state_node_id, trace_event_id, message_id,
+work_order_id, approval_id, artifact_id
 ```
-TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
-```
+
+Identity fields are not authority by themselves. Authority comes from scoped
+tenant policy, work orders, endpoint scopes, approvals, and gateway verification.
 
 ## Percept
 
@@ -45,17 +63,13 @@ TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
 - `name` (`String`): action identifier understood by adapters.
 - `params` (`serde_json::Value`): structured action parameters.
 - `side_effect_class` (`SideEffectClass`): domain classification.
-- `cost_estimate` (`Option<CostEstimate>`): resource estimate for quota checks.
 - `required_permissions` (`Vec<String>`): permission tokens.
 - `preconditions` (`Vec<String>`): required predicates before execution.
 - `postconditions` (`Vec<String>`): expected predicates after execution.
 
 `SideEffectClass` variants:
-- `ReadOnly`, `Filesystem`, `Network`, `External`, `Custom(String)`.
-
-`CostEstimate` fields:
-- `units` (`String`): unit label (e.g., `ms`, `bytes`).
-- `amount` (`f64`): numeric estimate.
+- `ReadOnly`, `Filesystem`, `Network`, `External`, `Physical`, or a custom
+  class where documented.
 
 ## QuotaUsage
 
@@ -86,9 +100,10 @@ TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
 `VerificationResult` records allow/deny decisions with traceable detail.
 
 **Fields**
+
 - `allowed` (`bool`): decision flag.
 - `reasons` (`Vec<String>`): ordered reason codes or messages.
-- `artifacts` (`serde_json::Value`): structured evidence and metadata.
+- `verifier_results`: structured per-verifier evidence when available.
 
 ## Feedback
 
@@ -109,24 +124,8 @@ TraceId = uuid_v5(NAMESPACE_OID, "{run_id}:{sequence}")
 - `recorded_at` (`OffsetDateTime`): capture timestamp.
 - `context` (`Option<serde_json::Value>`): structured reward context.
 
-## ContentHash
+## Stable extension rule
 
-`ContentHash` captures deterministic hashes for state nodes and snapshots.
-
-**Fields**
-- `algorithm` (`HashAlgorithm`): currently `Blake3`.
-- `value` (`String`): hex-encoded digest.
-
-**String format**
-```
-{algorithm}:{value}
-```
-
-## TraceIntegrity
-
-`TraceIntegrity` records per-tick integrity chain metadata.
-
-**Fields**
-- `prev_event_hash` (`Option<ContentHash>`): hash of the previous trace event.
-- `event_hash` (`ContentHash`): hash of the current `LoopTickCompleted` event
-  computed with integrity omitted.
+Extension metadata can carry display hints, external references, correlation IDs,
+or diagnostics. It must not grant permissions, override identity, install
+credentials, change quotas, bypass verifiers, or authorize adapters.

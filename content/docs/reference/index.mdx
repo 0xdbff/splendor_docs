@@ -1,24 +1,50 @@
 ---
 title: Reference
-description: Core interfaces and data contracts for the kernel.
+description: Public contracts for the Splendor runtime surface.
 ---
 
-The Splendor Kernel reference captures the canonical data structures, runtime
-contracts, storage interfaces, and audit event definitions that underpin the
-execution model.
+The Splendor reference summarizes public runtime contracts for local execution,
+SDKs, daemon clients, examples, trace/replay tooling, and stable primitive
+schemas. It intentionally avoids private crate internals and test-only details.
+
+Use this section when you need to understand what a Splendor run records,
+enforces, or exposes through public APIs.
 
 ## Sections
 
 <Cards>
+  <Card title="Identity" href="/docs/reference/identity" />
+  <Card title="Runtime Loop" href="/docs/reference/runtime-loop" />
   <Card title="Core Objects" href="/docs/reference/core-objects" />
   <Card title="Kernel Runtime" href="/docs/reference/kernel-runtime" />
+  <Card title="Daemon API" href="/docs/reference/daemon-api" />
+  <Card title="Daemon Security" href="/docs/reference/daemon-security" />
   <Card title="Run Config" href="/docs/reference/run-config" />
   <Card title="Action Gateway" href="/docs/reference/action-gateway" />
+  <Card title="Quotas" href="/docs/reference/quotas" />
   <Card title="State Graph" href="/docs/reference/state-graph" />
-  <Card title="State Store" href="/docs/reference/state-store" />
   <Card title="Trace Events" href="/docs/reference/trace-events" />
-  <Card title="Trace Store" href="/docs/reference/trace-store" />
+  <Card title="Messages" href="/docs/reference/messages" />
+  <Card title="Work Orders" href="/docs/reference/work-orders" />
+  <Card title="Fleet Foundations" href="/docs/reference/fleet" />
+  <Card title="Trace Sync & State Handoff" href="/docs/reference/trace-sync-state-handoff" />
+  <Card title="Governance" href="/docs/reference/governance" />
+  <Card title="Physical & Edge" href="/docs/reference/physical-edge" />
+  <Card title="Adapter Maturity" href="/docs/reference/adapter-maturity" />
+  <Card title="Replay" href="/docs/reference/replay" />
   <Card title="Serialization" href="/docs/reference/serialization" />
   <Card title="splendorctl" href="/docs/reference/splendorctl" />
   <Card title="Python Bindings" href="/docs/reference/python-bindings" />
 </Cards>
+
+## Compatibility boundaries
+
+Stable public contracts preserve:
+
+- distinct identity fields;
+- gateway-mediated side effects;
+- fail-closed verifier behavior;
+- explicit state commits;
+- append-only trace events;
+- replay side-effect suppression by default;
+- SDK and client behavior that does not bypass runtime enforcement.

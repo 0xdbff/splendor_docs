@@ -3,48 +3,44 @@ title: Serialization and Determinism
 description: Rules for serialization, hashing, and deterministic IDs.
 ---
 
-This document defines the serialization and hashing rules required for
-reproducible kernel runs.
+# Serialization and Determinism
+
+Splendor uses deterministic serialization, explicit identity fields, and content
+hashing so runs can be inspected and replayed reliably.
 
 ## Serialization Rules
 
-- All core objects derive `serde::Serialize` and `serde::Deserialize`.
-- JSON and CBOR round-trips must preserve semantic equality.
-- `TraceEvent.sequence` is strictly monotonic within a `RunId`.
+- Public schemas use stable serialized field names.
+- JSON output is suitable for trace export, replay inspection, and API clients.
+- Trace sequence numbers are strictly monotonic within a run.
+- Unknown extension metadata must not influence authorization, verifier results,
+  adapter selection, quota decisions, or replay authority.
 
 ## Timestamp Handling
 
-- `TraceEvent.timestamp` is captured at emission time and persisted verbatim.
-- Replay and audit tooling must use stored timestamps instead of wall-clock time.
+- Runtime events store their original timestamps.
+- Replay and audit tooling use stored timestamps rather than wall-clock time.
+- Stable cross-language schemas use RFC3339 timestamps unless a local SDK field
+  explicitly documents another representation.
 
 ## Content Hashing
 
-`ContentHash` uses `blake3` for deterministic digests. The canonical string
-format is:
+State nodes and trace integrity records use content hashes to make state and
+trace evidence tamper-evident.
+
+Canonical hash strings use:
 
 ```
 {algorithm}:{hex_digest}
 ```
 
-## Snapshot IDs
+## State nodes and snapshots
 
-`SnapshotId` is derived directly from the snapshot bytes:
+State node identity is derived from parent linkage, state data, and metadata.
+Snapshots are content-addressed references that replay and handoff tooling can
+validate before use.
 
-```
-SnapshotId = ContentHash::blake3(state_bytes)
-```
+## Trace integrity
 
-## State Node Hashing
-
-`StateNodeId` is derived from a serialized `StateNodeHashInput` payload:
-
-```
-{
-  parent_ids: [StateNodeId],
-  data_hash: ContentHash,
-  metadata: StateMetadata
-}
-```
-
-The payload is serialized with `serde_json` and hashed with BLAKE3. Any change
-in ordering or field representation will produce a new node ID.
+Trace stores can chain event hashes so missing, reordered, or corrupted records
+are detectable during export, audit, or replay.

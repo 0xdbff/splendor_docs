@@ -1,0 +1,49 @@
+---
+title: Replay
+description: Inspect runs without repeating side effects.
+---
+
+# Replay
+
+Replay reconstructs run behavior from trace and state evidence. It is inspect-only
+by default.
+
+## What replay can show
+
+- Percepts received during a run.
+- Policy outputs and proposed actions.
+- Constraint and verifier decisions.
+- Action outcomes and denial reasons.
+- State commits and snapshots.
+- Message causality and parent/child run links.
+- Work-order, approval, circuit-breaker, policy, and safety facts where present.
+
+## What replay does not do by default
+
+Replay does not:
+
+- call filesystem, HTTP, database, shell, webhook, artifact, or device adapters;
+- re-run policies or verifiers as fresh authority;
+- re-send messages;
+- contact approval or revocation services;
+- install or clear governance state;
+- mutate live state heads;
+- control physical simulators or devices.
+
+## CLI shape
+
+```bash
+splendorctl replay \
+  --db <trace-path> \
+  --state-db <state-path> \
+  --run <run-id>
+```
+
+Replay validates trace ordering, run scope, trace event identity, integrity
+metadata where available, and referenced state snapshots before reconstructing a
+run.
+
+## Failure behavior
+
+Replay fails clearly when trace or state data is missing, corrupt, out of order,
+wrongly scoped, or incompatible with the requested run.

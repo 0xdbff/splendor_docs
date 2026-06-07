@@ -1,0 +1,34 @@
+---
+title: Quotas
+description: Runtime resource limits for actions and adapters.
+---
+
+# Quotas
+
+Quotas bound runtime behavior by tenant, agent, run, and work-order scope. They
+prevent policies or delegated agents from silently consuming unbounded resources.
+
+## Common quota dimensions
+
+- actions per tick;
+- action duration;
+- filesystem read bytes;
+- filesystem write bytes;
+- network read bytes;
+- network write bytes;
+- HTTP requests;
+- adapter-specific bounded units where documented.
+
+## Enforcement
+
+Quota checks run before adapter execution. Exceeded quotas produce denial, pause,
+or intervention according to policy and context. Denied quota usage must not be
+converted into an implicit allow.
+
+When a work order narrows quotas, the effective quota is the stricter value from
+tenant policy and work-order authority.
+
+## Replay
+
+Replay can explain quota decisions from trace evidence. It does not consume
+quotas, reset ledgers, retry actions, or execute adapters.

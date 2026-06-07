@@ -1,0 +1,98 @@
+---
+title: Architecture
+description: How Splendor governs agent loops without dictating the AI stack.
+---
+
+# Architecture
+
+Splendor separates fast-moving AI logic from runtime enforcement. Models,
+policies, planners, and domain code can change quickly; Splendor keeps the
+identity, state, trace, verifier, quota, gateway, replay, and governance contracts
+stable.
+
+## System space and AI space
+
+**System space** is the enforced layer:
+
+- tenant and agent identity;
+- run and tick lifecycle;
+- action admission, verifier chains, quotas, and adapters;
+- explicit state graph commits;
+- append-only trace events;
+- replay and audit behavior;
+- scoped delegation, work orders, approvals, and governance boundaries.
+
+**AI space** is the iterative layer:
+
+- model calls;
+- policies and planners;
+- domain-specific prompts or algorithms;
+- data processing and simulation;
+- feedback and evaluation logic.
+
+The design rule is simple: **AI code proposes; the runtime enforces**.
+
+## The governed loop
+
+```text
+Percepts
+  -> Policy
+  -> Constraints
+  -> Action Gateway
+  -> Verifiers
+  -> Adapter
+  -> Outcome
+  -> State Commit
+  -> Trace
+```
+
+The Action Gateway is the side-effect boundary. Filesystem writes, HTTP calls,
+database mutations, artifact publication, messages that delegate authority, and
+physical-device actions are not allowed to bypass runtime verification.
+
+## Deployment shape
+
+Splendor runs in user space on Unix-like systems. A runtime instance may host one
+or more agent contexts, depending on trust, locality, hardware, and lifecycle
+boundaries.
+
+Public examples cover:
+
+- local single-agent loops;
+- Python SDK policies and adapters;
+- local daemon control;
+- TypeScript daemon clients;
+- typed local messages;
+- resident-node and fleet-foundation primitives;
+- governance and approval flows;
+- simulated physical/edge boundaries with high-level actions only.
+
+## Distributed and physical boundaries
+
+Splendor supports distributed and physical/edge primitives as explicit runtime
+contracts: node identity, work orders, capabilities, remote messages, trace sync,
+state handoff, policy caches, safety verifiers, and local trace buffers.
+
+Those primitives do not imply a production fleet scheduler, a global consensus
+system, or hardware safety certification. Physical examples use simulated,
+high-level, bounded actions such as `inspect_zone`, `move_to_waypoint`,
+`return_to_base`, and `dock`; Splendor does not control motors or replace
+firmware safety loops.
+
+## Security posture
+
+Splendor uses layered authority:
+
+```text
+transport security
+  -> caller authentication
+  -> endpoint scopes
+  -> signed work order
+  -> tenant / agent / run policy checks
+  -> gateway verification
+  -> adapter execution
+```
+
+A daemon token authenticates a caller. It is not permission to execute arbitrary
+agent actions. Signed work orders authorize runs. The Action Gateway authorizes
+side effects.

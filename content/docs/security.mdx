@@ -1,0 +1,66 @@
+---
+title: Security and Authority
+description: How Splendor separates caller identity, work-order authority, and gateway verification.
+---
+
+# Security and Authority
+
+Splendor treats daemon, SDK, sidecar, adapter, and control-plane communication as
+security boundaries. No client is trusted merely because it can reach a runtime.
+
+## Three separate authorities
+
+| Layer | What it proves | What it must not do |
+| --- | --- | --- |
+| Caller credential | Authenticates the app, SDK, CLI, sidecar, adapter, operator console, or control plane. | Must not authorize arbitrary agent actions by itself. |
+| Signed work order | Authorizes a run objective, allowed actions, adapters, permissions, data refs, quotas, placement, expiry, and audience. | Must not bypass runtime gateway or verifier enforcement. |
+| Action Gateway | Authorizes side effects after constraints and verifier evaluation. | Must not be skipped by SDK, API handlers, replay, control planes, or tests. |
+
+## Layered authorization
+
+```text
+transport security
+  -> caller authentication
+  -> endpoint scopes
+  -> signed work order
+  -> tenant / agent / run checks
+  -> gateway verification
+  -> adapter execution
+```
+
+No layer replaces another. A daemon token authenticates the caller; it does not
+grant broad action authority.
+
+## Caller credentials
+
+Non-dev daemon calls need:
+
+- authenticated caller principal;
+- endpoint scopes;
+- tenant or fleet binding;
+- intended audience;
+- expiry;
+- revocation path;
+- audit attribution for mutating calls.
+
+Anonymous non-dev calls fail closed.
+
+## Signed work orders
+
+Work orders carry scoped run authority: actions, adapters, permissions, data refs,
+quotas, placement requirements, issue/expiry times, revocation metadata, and
+signature. Invalid, unsigned, expired, revoked, overbroad, or incompatible work
+orders are rejected before run start or resume.
+
+## Local development mode
+
+Explicit insecure local development mode is allowed only when it is loopback or
+Unix-socket bound, visibly warned at startup, and not used for production, fleet,
+remote, or resident-node operation. SDKs and clients must not silently fall back
+to unauthenticated communication.
+
+## Trace and replay security
+
+Trace reads require visibility and redaction policy. Replay can inspect recorded
+authorization facts, but it does not reuse caller credentials, re-authorize old
+work orders, call external approval systems, or execute side effects.

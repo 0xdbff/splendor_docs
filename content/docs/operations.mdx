@@ -1,0 +1,79 @@
+---
+title: Operations
+description: Public operational patterns for local runtime, daemon, fleet foundations, governance, and physical simulations.
+---
+
+# Operations
+
+Splendor's operational docs focus on repeatable, local-first runtime behavior.
+They explain how to run loops, inspect evidence, replay safely, and use foundation
+primitives without turning them into unsupported production claims.
+
+## Local runtime
+
+Use `splendorctl` to run a local config, export traces, inspect state, and replay:
+
+```bash
+cargo build -p splendorctl
+./target/debug/splendorctl run --config ./examples/local-basic-loop/config.yaml --cycles 1
+./target/debug/splendorctl trace export --db ./examples/local-basic-loop/data/trace.db --run <run-id>
+./target/debug/splendorctl state head --db ./examples/local-basic-loop/data/trace.db --run <run-id>
+./target/debug/splendorctl replay --db ./examples/local-basic-loop/data/trace.db --state-db ./examples/local-basic-loop/data/state.db --run <run-id>
+```
+
+The local path proves the core loop: policy proposes actions, the gateway verifies
+them, adapters execute only when allowed, state commits, and traces are recorded.
+
+## Runtime daemon
+
+The local runtime daemon is a control boundary for run lifecycle, percept append,
+trace/state reads, replay, and gateway-mediated action submission.
+
+Important boundaries:
+
+- explicit local development mode is loopback-only;
+- non-dev callers need credentials, scopes, audience, expiry, revocation, and
+  audit attribution;
+- run create/resume requires signed work-order authority;
+- `/actions` submits to the gateway and cannot self-attest verification;
+- replay is inspect-only by default.
+
+## Resident and fleet foundations
+
+Resident/fleet primitives describe nodes and runtime instances with explicit
+identity, capabilities, heartbeats, signed work orders, placement hints, trace
+sync, state handoff, and telemetry.
+
+These primitives are intentionally foundation-level. Telemetry is observational,
+not authority. Placement hints are not a production autoscaler. State handoff uses
+explicit snapshots or references, not shared mutable memory.
+
+## Governance
+
+Governance removes, pauses, or narrows authority. It does not bypass the Action
+Gateway.
+
+Public governance patterns include:
+
+- approval-required actions that pause before adapter execution;
+- scoped approval grants and denials;
+- deterministic escalation for runtime risk;
+- circuit-breaker denials;
+- policy TTL and revocation behavior;
+- inspect-only governance replay and audit export.
+
+## Physical and edge simulations
+
+Physical/edge docs cover simulated, high-level, bounded device actions. Splendor
+supervises autonomy above local middleware and real-time controllers.
+
+Allowed physical actions are high-level requests such as `read_battery`,
+`inspect_zone`, `move_to_waypoint`, `return_to_base`, and `dock`. Splendor does
+not expose raw motor writes, firmware bypass, cloud-to-actuator control, or
+hard-real-time stabilization.
+
+## External control planes
+
+External control planes can issue scoped work orders, approval decisions, and
+artifact references. Splendor remains source of truth for runtime enforcement,
+state commits, trace events, and replay.

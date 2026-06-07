@@ -1,0 +1,75 @@
+---
+title: SDK & API
+description: Public Python, TypeScript, and daemon API surfaces for working with Splendor.
+---
+
+# SDK & API
+
+Splendor exposes ergonomic SDK and API surfaces, but runtime-critical enforcement
+remains in the Rust core and daemon path.
+
+## Python SDK
+
+The Python SDK is a local development surface for policies, perceptors,
+constraints, adapters, trace subscriptions, and replay inspection.
+
+Stable local hooks include:
+
+- `create_tenant(...)`
+- `create_agent(...)`
+- `register_perceptor(...)`
+- `register_policy(...)`
+- `register_constraints(...)`
+- `register_adapter(...)`
+- `subscribe_traces(...)`
+- `tail_traces(...)`
+- `replay_run(...)`
+- `run_once(...)`
+
+Python policies propose actions. Official examples do not execute privileged
+filesystem, network, database, shell, webhook, artifact, or device side effects
+directly from policy callbacks.
+
+## TypeScript packages
+
+The TypeScript surface is for schemas and daemon/client workflows:
+
+| Package | Purpose |
+| --- | --- |
+| `@splendor/types` | Canonical TypeScript interfaces for daemon-facing schemas. |
+| `@splendor/client` | Thin authenticated HTTP client for the runtime daemon API. |
+
+TypeScript does not implement the runtime, verifier chain, gateway, adapter
+execution, state graph, trace store, or replay engine.
+
+## Runtime daemon API
+
+The local daemon API exposes run lifecycle, percept append, action submission,
+state-head read, trace read/export, replay, health, and capabilities.
+
+The stable authority stack is:
+
+```text
+transport security -> caller authentication -> endpoint scopes -> signed work order -> runtime policy checks -> gateway verification
+```
+
+Important boundaries:
+
+- A caller credential authenticates the app or client.
+- Endpoint scopes authorize API access.
+- A signed work order authorizes a run objective and scope.
+- The Action Gateway authorizes side effects.
+- Health, capabilities, and telemetry responses are informational; they are not
+  action authority.
+
+## Local development mode
+
+Local daemon examples may use explicit loopback-only insecure development mode.
+That mode is for local testing only and must not be used as a production or
+fleet-facing daemon configuration.
+
+## OpenAPI
+
+The daemon contract is documented in the kernel repository at
+`openapi/splendor-runtime-daemon.yaml`. Public clients should align with that
+contract rather than private runtime helpers.

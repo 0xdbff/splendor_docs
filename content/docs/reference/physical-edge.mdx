@@ -1,0 +1,53 @@
+---
+title: Physical and Edge
+description: High-level physical actions, safety verifiers, offline policy, and cloud helper boundaries.
+---
+
+# Physical and Edge
+
+Splendor can govern physical and edge autonomy through high-level bounded actions,
+local safety verification, cached policy, local trace buffers, and advisory cloud
+helpers. It is not a hard-real-time controller.
+
+## Allowed high-level actions
+
+Examples include:
+
+- `read_battery`
+- `read_sensor_summary`
+- `read_map`
+- `move_to_waypoint`
+- `return_to_base`
+- `dock`
+- `inspect_zone`
+- `capture_image`
+- `pause_mission`
+- `resume_mission`
+- `request_operator_override`
+- `notify_operator`
+- `upload_trace_summary`
+
+These are requests to local middleware or controllers, not raw actuator commands.
+
+## Forbidden direct actions
+
+Splendor rejects raw actuator writes, motor PWM, firmware safety bypass,
+flight-controller internals, collision-avoidance bypass, emergency-stop bypass,
+hard-real-time stabilization, and direct cloud-to-actuator commands.
+
+## Local safety verifiers
+
+Safety verifiers can check evidence such as geofence, altitude, battery, collision
+risk, human proximity, emergency stop, privacy zones, and route constraints before
+adapters execute.
+
+## Offline behavior
+
+Disconnected nodes may continue only within cached policy. Expired or missing
+policy denies high-risk side effects or requires intervention. Local trace buffers
+preserve ordered evidence and sync after reconnect.
+
+## Cloud helper boundary
+
+Cloud helpers may return proposals, route artifacts, or typed messages. Local
+device Splendor verifies those proposals before any bounded action executes.
