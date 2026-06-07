@@ -12,7 +12,7 @@ export default function HomePage() {
             width={1050}
             height={300}
             priority
-            className="h-auto w-64 rounded-2xl border border-fd-border bg-black shadow-sm md:w-80"
+            className="h-auto w-64 transition dark:invert md:w-80"
           />
         </div>
 
