@@ -12,16 +12,17 @@ export default function HomePage() {
             width={1050}
             height={300}
             priority
-            className="h-auto w-64 transition dark:invert md:w-80"
+            className="h-auto w-80 transition dark:invert md:w-[28rem]"
           />
         </div>
 
-        <div className="space-y-4">
-          <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-            An AI Kernel for Self-Managed Neuro-Symbolic Agents
-          </h1>
+        <div className="space-y-3">
+          <p className="text-sm font-medium uppercase tracking-[0.28em] text-fd-muted-foreground">
+            Documentation
+          </p>
           <p className="mx-auto max-w-xl text-base text-fd-muted-foreground md:text-lg">
-            Kernel-grade runtime for persistent, governable agent loops.
+            Documentation for Splendor, a kernel-grade runtime for persistent,
+            governable agent loops.
           </p>
         </div>
 
