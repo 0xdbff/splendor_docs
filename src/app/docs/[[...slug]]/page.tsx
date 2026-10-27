@@ -5,6 +5,7 @@ import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
+import { docsMetadata } from '@/lib/seo';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -43,11 +44,16 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  return {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: ['/og/splendor-og.png'],
-    },
-  };
+  const section = page.slugs.length > 1
+    ? page.slugs[0] === 'reference' ? 'Reference' : page.slugs[0] === 'examples' ? 'Example' : ''
+    : '';
+  const title = section && !page.data.title.toLowerCase().endsWith(section.toLowerCase())
+    ? `${page.data.title} ${section}`
+    : page.data.title;
+
+  return docsMetadata(
+    `${title} | Splendor Kernel`,
+    page.data.description ?? `Read ${page.data.title} in the Splendor Kernel documentation.`,
+    page.url,
+  );
 }

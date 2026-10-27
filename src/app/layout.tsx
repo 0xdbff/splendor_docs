@@ -2,6 +2,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import type { Metadata } from 'next';
 import { Geist, Syne } from 'next/font/google';
+import { docsDescription, docsUrl } from '@/lib/seo';
 
 const geist = Geist({
   subsets: ['latin'],
@@ -15,13 +16,12 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://docs.splendor-k.org'),
+  metadataBase: new URL(docsUrl),
   title: {
-    default: 'Splendor Kernel',
+    default: 'Splendor Kernel Documentation',
     template: '%s | Splendor Kernel',
   },
-  description:
-    'Public documentation for Splendor, a governed runtime substrate for autonomous agent loops, verified actions, explicit state, traces, and replay.',
+  description: docsDescription,
   applicationName: 'Splendor Kernel',
   keywords: [
     'neuro-symbolic AI',
@@ -31,9 +31,6 @@ export const metadata: Metadata = {
     'multi-tenant agents',
     'agent safety enforcement',
   ],
-  alternates: {
-    canonical: '/',
-  },
   icons: {
     icon: [
       { url: '/favicon.ico' },
@@ -47,7 +44,7 @@ export const metadata: Metadata = {
     title: 'Splendor Kernel',
     description:
       'Public documentation for Splendor: governed agent loops, verified actions, explicit state, traces, and replay.',
-    url: 'https://docs.splendor-k.org',
+    url: docsUrl,
     siteName: 'Splendor Kernel',
     type: 'website',
     images: [
@@ -69,6 +66,8 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
   },
 };
 

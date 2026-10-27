@@ -1,5 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { docsDescription, docsMetadata } from '@/lib/seo';
+
+export const metadata = docsMetadata('Splendor Kernel Documentation', docsDescription, '/');
 
 export default function HomePage() {
   return (
@@ -17,9 +20,9 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-[0.28em] text-fd-muted-foreground">
-            Documentation
-          </p>
+          <h1 className="text-sm font-medium uppercase tracking-[0.28em] text-fd-muted-foreground">
+            Splendor Kernel documentation
+          </h1>
           <p className="mx-auto max-w-xl text-base text-fd-muted-foreground md:text-lg">
             Documentation for Splendor, a kernel-grade runtime for persistent,
             governable agent loops.
